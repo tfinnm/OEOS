@@ -93,6 +93,7 @@ if ($result->num_rows > 0) {
     // output data of each row
     while($row = $result->fetch_assoc()) {
 		$pswrd = $row["upass"];
+		$id = $row["ID"];
     }
 } else {
     die("<script>location.href = '?error=login'</script>");
@@ -101,6 +102,7 @@ $conn->close();
 	if (password_verify( $_POST["pswrd"] , $pswrd )) {
 	//	session_start();
 		$_SESSION["loggedin"] = true;
+		$_SESSION["UnitID"] = $id;
 		echo ("<script>location.href = '.'</script>");
 	}else {
 		die("<script>location.href = '?error=login'</script>");
