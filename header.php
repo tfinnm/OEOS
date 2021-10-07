@@ -1,7 +1,6 @@
 <?php
 
 	session_start();
-	$_SESSION["incident"] = 1;
 	if (!isset($_SESSION["loggedin"])) {
 		die("<script>location.href = 'login.php?error=notlogged'</script>");
 	}
