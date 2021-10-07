@@ -135,7 +135,7 @@
 	</select>
   </div>
   <button type="submit" class="btn btn-default">Filter</button>
-  <button href="" class="btn btn-default">Reset</button>
+  <button type="button" onClick="window.location.href = window.location.href;" class="btn btn-default">Reset</button>
 </form>
 </center>
 
