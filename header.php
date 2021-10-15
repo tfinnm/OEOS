@@ -4,6 +4,10 @@
 	if (!isset($_SESSION["loggedin"])) {
 		die("<script>location.href = 'login.php?error=notlogged'</script>");
 	}
+	include("permissions.php");
+	if (!isset($_SESSION["permissions"])) {
+		getPermissions();
+	}
 		
 	print "
 		<meta charset=\"utf-8\">
@@ -26,12 +30,12 @@
 				</div>
 				<div class=\"collapse navbar-collapse\" id=\"myNavbar\">
 					<ul class=\"nav navbar-nav\">
-						<li><a href=\".\">Unit Mgmt</a></li>
-						<li><a href=\"#\">Command Board</a></li>
-						<li><a href=\"products\">Unit Board</a></li>
-						<li><a href=\"news\">Dispatch</a></li>
-						<li><a href=\"#\">EMS</a></li>
-					</ul>
+						<li><a href=\".\">Home</a></li>
+		";
+		if ($_SESSION["permissions"]["assign"]) {
+			echo "		<li><a href=\"unitboard\">Dispatch Board</a></li>";
+		}
+		print "		</ul>
 					<!-- <form class=\"navbar-form navbar-right\" role=\"search\">
 						<div class=\"form-group input-group\">
 							<input type=\"text\" class=\"form-control\" placeholder=\"Search..\">
@@ -43,7 +47,7 @@
 						</div>
 					</form> -->
 					<ul class=\"nav navbar-nav navbar-right\">
-						<li><a href=\"#\" style=\"background:red;color:white\"><b>!!! MAYDAY !!!</b></a></li>
+						<li><a onclick=\"new Audio('resources/mayday.mp3').play();\" href=\"#\" style=\"background:red;color:white\"><b>!!! MAYDAY !!!</b></a></li>
 					</ul>
 				</div>
 			</div>

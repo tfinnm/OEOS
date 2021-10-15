@@ -94,6 +94,7 @@ if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
 		$pswrd = $row["upass"];
 		$id = $row["ID"];
+		$incident = $row["incidentID"];
     }
 } else {
     die("<script>location.href = '?error=login'</script>");
@@ -103,6 +104,7 @@ $conn->close();
 	//	session_start();
 		$_SESSION["loggedin"] = true;
 		$_SESSION["UnitID"] = $id;
+		$_SESSION["incident"] = $incident;
 		echo ("<script>location.href = '.'</script>");
 	}else {
 		die("<script>location.href = '?error=login'</script>");

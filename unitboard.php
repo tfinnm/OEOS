@@ -1,13 +1,61 @@
 <?php
 	include("header.php");
-?>
 
-<?php
-		include("db.php");
+	include("db.php");
+		
+if (isset($_GET["assign"])) {
+// Create connection
+$conn = new mysqli($db_server, $db_user, $db_password, $db_db);
+// Check connection
+if ($conn->connect_error) {
+    echo "
+			<div class=\"alert alert-danger alert-dismissible\">
+				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
+				<strong>Error:</strong> A Server Error has Occured. [ECode: INCI-HT500C]
+			</div>";
+} 
+$sql2 = "UPDATE units SET incidentID = ".$_SESSION["incident"].", status = 'dispatched' WHERE ID = ".$_GET["assign"];
+if ($conn->query($sql2) === TRUE) {
+} else {
+	echo "
+	<div class=\"alert alert-danger alert-dismissible\">
+		<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
+		<strong>Error:</strong> A Server Error has Occured. - Failed To Update Unit Assignment [ECode: INCI-HT500D]
+	</div>";
+}
+$conn->close();
+}
+if (isset($_GET["cancel"])) {
+// Create connection
+$conn = new mysqli($db_server, $db_user, $db_password, $db_db);
+// Check connection
+if ($conn->connect_error) {
+    echo "
+			<div class=\"alert alert-danger alert-dismissible\">
+				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
+				<strong>Error:</strong> A Server Error has Occured. [ECode: INCI-HT500E]
+			</div>";
+} 
+$sql2 = "UPDATE units SET status = 'clear' WHERE ID = ".$_GET["cancel"];
+if ($conn->query($sql2) === TRUE) {
+} else {
+	echo "
+	<div class=\"alert alert-danger alert-dismissible\">
+		<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
+		<strong>Error:</strong> A Server Error has Occured. - Failed To Update Unit Assignment [ECode: INCI-HT500F]
+	</div>";
+}
+$conn->close();
+}
+		
 		$conn = new mysqli($db_server, $db_user, $db_password, $db_db);
 		// Check connection
 		if ($conn->connect_error) {
-			die("<script>location.href = 'index.php?error=server'</script>");
+			echo "
+			<div class=\"alert alert-danger alert-dismissible\">
+				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
+				<strong>Error:</strong> A Server Error has Occured. [ECode: INCI-HT500G]
+			</div>";
 		}
 		$depts = "";
 
@@ -21,9 +69,9 @@
 		}
 		
 		
-		$sql = "SELECT * FROM units";
+		$sql = "SELECT * FROM units WHERE assignable = '1'";
 		if (isset($_POST["dept"])) {
-			$sql = "SELECT * FROM units WHERE deptID = '".$_POST["dept"]."'";
+			$sql = "SELECT * FROM units WHERE assignable = '1' AND deptID = '".$_POST["dept"]."'";
 		}
 		$result = $conn->query($sql);
 		
@@ -33,22 +81,40 @@
 		if ($result->num_rows > 0) {
 			// output data of each row
 			while($row = $result->fetch_assoc()) {
-				$status = "<h4 style=\"color:blue\">Unknown</h4>";
+				$status = "<h4>Unknown</h4>";
 				switch ($row["status"]) {
-					case "available":
-						$status = "<h4 style=\"color:green\">Available</h4>";
+					case "AvailableQ":
+						$status = "<h4 style=\"color:green\">Available In Quarters</h4>";
 						break;
-					case "dispatched":
-						$status = "<h4 style=\"color:yellow\">Dispatched</h4>";
+					case "Available":
+						$status = "<h4 style=\"color:yellow\">Available Out Of Quarters</h4>";
 						break;
-					case "returning":
-						$status = "<h4 style=\"color:yellow\">Returning to Service</h4>";
+					case "StandBy":
+						$status = "<h4 style=\"color:yellow\">On Stand-By</h4>";
 						break;
-					case "oos":
-						$status = "<h4 style=\"color:red\">Out of Service</h4>";
+					case "Training":
+						$status = "<h4 style=\"color:yellow\">Training</h4>";
+						break;
+					case "Fuel":
+						$status = "<h4 style=\"color:yellow\">Refueling</h4>";
+						break;
+					case "OOS":
+						$status = "<h4 style=\"color:red\">Out Of Service</h4>";
 						break;
 					case "staff":
-						$status = "<h4 style=\"color:red\">Missing Staffing</h4>";
+						$status = "<h4 style=\"color:red\">Not Staffed</h4>";
+						break;
+					case "dispatched":
+						$status = "<h4 style=\"color:blue\">Dispatched</h4>";
+						break;
+					case "enroute":
+						$status = "<h4 style=\"color:blue\">En Route</h4>";
+						break;
+					case "scene":
+						$status = "<h4 style=\"color:blue\">On Scene</h4>";
+						break;
+					case "clear":
+						$status = "<h4 style=\"color:yellow\">Clearing From Scene</h4>";
 						break;
 				}
 				
@@ -90,12 +156,14 @@
 				}
 				
 				$assignButton = "";
-				if (!isset($_SESSION["incident"])) {
+				if (!$_SESSION["permissions"]["assign"]) {
+					$assignButton = "<p>INCI-403 Insufficient Permssions</p>";
+				} elseif (!isset($_SESSION["incident"])) {
 					$assignButton = "<p>Please Select Incident</p>";
 				} elseif ($_SESSION["incident"]  == $row["incidentID"]) {
-					$assignButton = "<button class=\"btn btn-danger\">Cancel from Incident</button>";
+					$assignButton = "<a href='?cancel=".$row["ID"]."'><button class=\"btn btn-danger\">Cancel from Incident</button></a>";
 				} else {
-					$assignButton = "<button class=\"btn btn-default\">Assign to Incident</button>";
+					$assignButton = "<a href='?assign=".$row["ID"]."'><button class=\"btn btn-default\">Assign to Incident</button></a>";
 				}
 				
 				$boxes .= "
