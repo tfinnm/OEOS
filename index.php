@@ -76,6 +76,7 @@ if ($result->num_rows > 0) {
 		$uid = $row["Unit"];
     }
 	if (($uid == null) or ($uid == "null") or ($uid == "")) {
+    }
 	if (password_verify( $_POST["pswrd"] , $pswrd )) {
 		$sql2 = "UPDATE personel SET Unit = '".$_SESSION["UnitID"]."' WHERE ID = ".$id;
 		if ($conn->query($sql2) === TRUE) {
