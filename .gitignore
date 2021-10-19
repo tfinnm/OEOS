@@ -3,3 +3,7 @@ Internal Tools/*
 Documentation/~$OEOSErrorKey.xlsx
 libraries/*
 libraries/bootstrap-3.4.1-dist/css/*
+libraries/bootstrap-3.4.1-dist/fonts/*
+libraries/bootstrap-3.4.1-dist/js/*
+libraries/fpdf/*
+libraries/fpdf/font/*
