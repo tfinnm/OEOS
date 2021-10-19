@@ -73,7 +73,9 @@ if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
 		$pswrd = $row["upass"];
 		$id = $row["ID"];
+		$uid = $row["Unit"];
     }
+	if (($uid == null) or ($uid == "null") or ($uid == "")) {
 	if (password_verify( $_POST["pswrd"] , $pswrd )) {
 		$sql2 = "UPDATE personel SET Unit = '".$_SESSION["UnitID"]."' WHERE ID = ".$id;
 		if ($conn->query($sql2) === TRUE) {
@@ -91,6 +93,12 @@ if ($result->num_rows > 0) {
 			<div class=\"alert alert-warning alert-dismissible\">
 				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 				<strong>Error:</strong> Invalid Username/Password Combo. [ECode: Auth-HT401]
+			</div>";
+	}
+	}else{
+		echo "<div class=\"alert alert-info alert-dismissible\">
+				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
+				<strong>Error:</strong> Already Logged In. Please log out before logging in.
 			</div>";
 	}
 } else {
