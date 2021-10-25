@@ -7,7 +7,7 @@ $conn = new mysqli($db_server, $db_user, $db_password, $db_db);
 // Check connection
 if ($conn->connect_error) {
     echo "
-			<div class=\"alert alert-danger alert-dismissible\">
+			<div class=\"alert alert-warning alert-dismissible\">
 				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 				<strong>Error:</strong> A Server Error has Occured. [ECode: UAuth-HT500A]
 			</div>";
@@ -18,7 +18,7 @@ if ($conn->query($sql2) === TRUE) {
 	echo "<script>window.location.replace('.');</script>";
 } else {
 	echo "
-	<div class=\"alert alert-danger alert-dismissible\">
+	<div class=\"alert alert-warning alert-dismissible\">
 		<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 		<strong>Error:</strong> A Server Error has Occured. - Failed To Update Unit Assignment [ECode: UAuth-HT500B]
 	</div>";
@@ -31,7 +31,7 @@ $conn = new mysqli($db_server, $db_user, $db_password, $db_db);
 // Check connection
 if ($conn->connect_error) {
     echo "
-			<div class=\"alert alert-danger alert-dismissible\">
+			<div class=\"alert alert-warning alert-dismissible\">
 				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 				<strong>Error:</strong> A Server Error has Occured. [ECode: INCI-HT500A]
 			</div>";
@@ -47,7 +47,7 @@ if ($conn->query($sql2) === TRUE) {
 	echo "<script>window.location.replace('.');</script>";
 } else {
 	echo "
-	<div class=\"alert alert-danger alert-dismissible\">
+	<div class=\"alert alert-warning alert-dismissible\">
 		<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 		<strong>Error:</strong> A Server Error has Occured. - Failed To Update Unit Assignment [ECode: INCI-HT500B]
 	</div>";
@@ -61,7 +61,7 @@ $conn = new mysqli($db_server, $db_user, $db_password, $db_db);
 // Check connection
 if ($conn->connect_error) {
     echo "
-			<div class=\"alert alert-danger alert-dismissible\">
+			<div class=\"alert alert-warning alert-dismissible\">
 				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 				<strong>Error:</strong> A Server Error has Occured. [ECode: UAuth-HT500A]
 			</div>";
@@ -83,7 +83,7 @@ if ($result->num_rows > 0) {
 			echo "<script>window.location.replace('.');</script>";
 		} else {
 			echo "
-			<div class=\"alert alert-danger alert-dismissible\">
+			<div class=\"alert alert-warning alert-dismissible\">
 				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 				<strong>Error:</strong> A Server Error has Occured. - Failed To Update Unit Assignment [ECode: UAuth-HT500B]
 			</div>";
@@ -117,7 +117,7 @@ $conn = new mysqli($db_server, $db_user, $db_password, $db_db);
  // Check connection
   if ($conn->connect_error) {
     echo "
-			<div class=\"alert alert-danger alert-dismissible\">
+			<div class=\"alert alert-warning alert-dismissible\">
 				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 				<strong>Error:</strong> A Server Error has Occured. [ECode: UNIT-HT500A]
 			</div>";
@@ -128,7 +128,7 @@ $sql = "UPDATE units SET status='".$_POST["statusChange"]."' WHERE ID = ".$_SESS
 if ($conn->query($sql) === TRUE) {
 } else {
     echo "
-			<div class=\"alert alert-danger alert-dismissible\">
+			<div class=\"alert alert-warning alert-dismissible\">
 				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 				<strong>Error:</strong> A Server Error has Occured. - Failed To Update Status [ECode: UNIT-HT500C]
 			</div>";
@@ -140,7 +140,7 @@ $conn->close();
 		// Check connection
 		if ($conn->connect_error) {
 			echo "
-			<div class=\"alert alert-danger alert-dismissible\">
+			<div class=\"alert alert-warning alert-dismissible\">
 				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 				<strong>Error:</strong> A Server Error has Occured. [ECode: UNIT-HT500A]
 			</div>";
@@ -155,7 +155,7 @@ $conn->close();
 			}
 		} else {
 			echo "
-			<div class='alert alert-danger alert-dismissible'>
+			<div class='alert alert-warning alert-dismissible'>
 				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 				<strong>Error:</strong> A Server Error has Occured. - Unable to Find Unit [ECode: UNIT-HT500B]
 			</div>";
@@ -407,6 +407,11 @@ if ($result->num_rows > 0) {
 		}
 		if (!($_SESSION["permissions"]["selfassign"])) {
 			$permdis = "disabled ";
+		}
+		$sql2 = "SELECT * FROM maydays WHERE Incident = '".$row["ID"]."' AND Active = '1' ORDER BY 'ID' DESC LIMIT 1";
+		$result2 = $conn->query($sql);
+		if ($result2->num_rows > 0) {
+			
 		}
 		echo "
 		<tr>
