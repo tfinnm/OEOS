@@ -165,11 +165,11 @@ $conn->close();
 	$statusText = $status;
 	switch ($status) {
 		case "AvailableQ":
-			$statusText = "Available In Quaters";
+			$statusText = "Available In Quarters";
 			$statusColor = "panel-success";
 			break;
 		case "Available":
-			$statusText = "Available Out of Quaters";
+			$statusText = "Available Out of Quarters";
 			$statusColor = "panel-warning";
 			break;
 		case "StandBy":
@@ -225,8 +225,8 @@ $conn->close();
 			<center>
 			<form action='' method='post'><select name='statusChange' class='form-control' onchange='if(this.value != 0) { this.form.submit(); }' ".$disableChange.">
 						<option value='' selected disabled hidden>".$statusText."</option>
-						<option value='AvailableQ'>Available In Quaters</option>
-						<option value='Available'>Available Out of Quaters</option>
+						<option value='AvailableQ'>Available In Quarters</option>
+						<option value='Available'>Available Out of Quarters</option>
 						<option value='StandBy'>On Stand-By</option>
 						<option value='Training'>Training</option>
 						<option value='Fuel'>Refueling</option>
