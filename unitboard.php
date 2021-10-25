@@ -9,7 +9,7 @@ $conn = new mysqli($db_server, $db_user, $db_password, $db_db);
 // Check connection
 if ($conn->connect_error) {
     echo "
-			<div class=\"alert alert-danger alert-dismissible\">
+			<div class=\"alert alert-warning alert-dismissible\">
 				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 				<strong>Error:</strong> A Server Error has Occured. [ECode: INCI-HT500C]
 			</div>";
@@ -18,7 +18,7 @@ $sql2 = "UPDATE units SET incidentID = ".$_SESSION["incident"].", status = 'disp
 if ($conn->query($sql2) === TRUE) {
 } else {
 	echo "
-	<div class=\"alert alert-danger alert-dismissible\">
+	<div class=\"alert alert-warning alert-dismissible\">
 		<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 		<strong>Error:</strong> A Server Error has Occured. - Failed To Update Unit Assignment [ECode: INCI-HT500D]
 	</div>";
@@ -31,7 +31,7 @@ $conn = new mysqli($db_server, $db_user, $db_password, $db_db);
 // Check connection
 if ($conn->connect_error) {
     echo "
-			<div class=\"alert alert-danger alert-dismissible\">
+			<div class=\"alert alert-warning alert-dismissible\">
 				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 				<strong>Error:</strong> A Server Error has Occured. [ECode: INCI-HT500E]
 			</div>";
@@ -40,7 +40,7 @@ $sql2 = "UPDATE units SET status = 'clear' WHERE ID = ".$_GET["cancel"];
 if ($conn->query($sql2) === TRUE) {
 } else {
 	echo "
-	<div class=\"alert alert-danger alert-dismissible\">
+	<div class=\"alert alert-warning alert-dismissible\">
 		<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 		<strong>Error:</strong> A Server Error has Occured. - Failed To Update Unit Assignment [ECode: INCI-HT500F]
 	</div>";
@@ -52,7 +52,7 @@ $conn->close();
 		// Check connection
 		if ($conn->connect_error) {
 			echo "
-			<div class=\"alert alert-danger alert-dismissible\">
+			<div class=\"alert alert-warning alert-dismissible\">
 				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 				<strong>Error:</strong> A Server Error has Occured. [ECode: INCI-HT500G]
 			</div>";

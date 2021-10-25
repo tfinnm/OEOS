@@ -28,7 +28,7 @@
 			</div>";
 			} elseif (isset($_GET["error"]) && $_GET["error"] == "server") {
 				echo "
-			<div class=\"alert alert-danger alert-dismissible\">
+			<div class=\"alert alert-warning alert-dismissible\">
 				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 				<strong>Error:</strong> A Server Error has Occured. [ECode: Auth-HT500]
 			</div>";
