@@ -47,12 +47,26 @@
 						</div>
 					</form> -->
 					<ul class=\"nav navbar-nav navbar-right\">
-						<li><a onclick=\"new Audio('resources/mayday.mp3').play();\" href=\"#\" style=\"background:red;color:white\"><b>!!! MAYDAY !!!</b></a></li>
+						<li><a onclick=\"sendMayday()\" href=\"javascript:void(0)\" style=\"background:red;color:white\"><b>!!! MAYDAY !!!</b></a></li>
 					</ul>
 				</div>
 			</div>
 		</nav>
-	";
+		<script>
+			function sendMayday(){
+				var ajax = new XMLHttpRequest();
+				ajax.open('POST', 'mayday', true);
+				ajax.send();
+			}
+		</script>
+		<script>
+			if(typeof(EventSource) !== 'undefined') {
+				var source = new EventSource('recieveMayday.php');
+				source.onmessage = function(event) {
+					new Audio('resources/mayday.mp3').play();
+				};
+			}
+		</script>";
 	
 	//echo $_SERVER['REQUEST_URI'];
 
