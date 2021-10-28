@@ -15,6 +15,8 @@
 		<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css\">
 		<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js\"></script>
 		<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js\"></script>
+		<script src=\"libraries/dialogs/js/bootstrap-dialog.min.js\"></script>
+		<link rel=\"stylesheet\" href=\"libraries/dialogs/css/bootstrap-dialog.min.css\">
 	";
 	
 	print "
@@ -52,6 +54,7 @@
 				</div>
 			</div>
 		</nav>
+		<div id='maydayBanner'></div>
 		<script>
 			function sendMayday(){
 				var ajax = new XMLHttpRequest();
@@ -63,6 +66,18 @@
 			if(typeof(EventSource) !== 'undefined') {
 				var source = new EventSource('recieveMayday.php');
 				source.onmessage = function(event) {
+					document.getElementById('maydayBanner').innerHTML = '<div class=\"alert alert-danger alert-dismissible\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a><strong>MAYDAY! MAYDAY! MAYDAY!</strong> A Mayday has been declared on your incident.</div>';
+					BootstrapDialog.show({
+						type: BootstrapDialog.TYPE_DANGER,
+						title: 'MAYDAY!',
+						message: 'Mayday Declared on your incident, please acknowledge!',
+						buttons: [{
+							label: 'Acknowledge',
+							action: function(dialogItself){
+								dialogItself.close();
+							}
+						}]
+					});
 					new Audio('resources/mayday.mp3').play();
 				};
 			}

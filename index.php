@@ -340,9 +340,7 @@ echo "
 							<script>
 								var mymap = L.map('incidentmap').setView([0, 0], 2);
 								L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {attribution: 'Tiles &copy; Esri'}).addTo(mymap);
-								new GeoSearchControl({
-									provider: new OpenStreetMapProvider(),
-								}).geosearch('New York, NY');
+								
 							</script>
 							<div class='col-sm-6'>
 								<h4><b>Address:</b></h4>
@@ -408,13 +406,16 @@ if ($result->num_rows > 0) {
 		if (!($_SESSION["permissions"]["selfassign"])) {
 			$permdis = "disabled ";
 		}
-		$sql2 = "SELECT * FROM maydays WHERE Incident = '".$row["ID"]."' AND Active = '1' ORDER BY 'ID' DESC LIMIT 1";
-		$result2 = $conn->query($sql);
+		$sql2 = "SELECT * FROM maydays WHERE Incident = '".$row["ID"]."' AND Active = '1'";
+		$result2 = $conn->query($sql2);
+		$maydaytableindicator = "";
 		if ($result2->num_rows > 0) {
-			
+			while($row2 = $result2->fetch_assoc()) {
+				$maydaytableindicator = "class='danger'";
+			}
 		}
 		echo "
-		<tr>
+		<tr ".$maydaytableindicator.">
 			<td>".explode(" ",$row["timeOut"])[1]."</td>
 			<td>".$row["type"]."</td>
 			<td>".$row["address"]."</td>
