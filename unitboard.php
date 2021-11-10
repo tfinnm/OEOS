@@ -16,6 +16,14 @@ if ($conn->connect_error) {
 } 
 $sql2 = "UPDATE units SET incidentID = ".$_SESSION["incident"].", status = 'dispatched' WHERE ID = ".$_GET["assign"];
 if ($conn->query($sql2) === TRUE) {
+	$sql = "SELECT * FROM units WHERE ID = ".$_GET["assign"];
+	$result = $conn->query($sql);
+	if ($result->num_rows > 0) {
+		while($row = $result->fetch_assoc()) {
+			$logsql = "INSERT INTO events (Incident,Event) VALUES ('".$_SESSION["incident"]."','Assigned ".$row["shortName"]." to incident')";
+			$conn->query($logsql);
+		}
+	}
 } else {
 	echo "
 	<div class=\"alert alert-warning alert-dismissible\">

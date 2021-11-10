@@ -44,6 +44,14 @@ if ($_GET["assign"] == "null") {
 	$_SESSION["incident"] = $_GET["assign"];
 }
 if ($conn->query($sql2) === TRUE) {
+	$sql3 = "SELECT * FROM units WHERE ID = ".$_GET["assign"];
+	$result3 = $conn->query($sql3);
+	if ($result3->num_rows > 0) {
+		while($row3 = $result3->fetch_assoc()) {
+			$logsql = "INSERT INTO events (Incident,Event) VALUES ('".$_GET["assign"]."','Assigned ".$row3["shortName"]." to incident')";
+			$conn->query($logsql);
+		}
+	}
 	echo "<script>window.location.replace('.');</script>";
 } else {
 	echo "
@@ -214,6 +222,14 @@ $conn->close();
 			break;
 	}
 	if (($_SESSION["incident"] != null) and !(($status == "clear") or ($status == "scene") or ($status == "enroute") or ($status == "dispatched"))) {
+		$sql3 = "SELECT * FROM units WHERE ID = ".$_SESSION["UnitID"];
+		$result3 = $conn->query($sql3);
+		if ($result3->num_rows > 0) {
+			while($row3 = $result3->fetch_assoc()) {
+				$logsql = "INSERT INTO events (Incident,Event) VALUES ('".$_SESSION["incident"]."','".$row3["shortName"]." cleared from incident')";
+				$conn->query($logsql);
+			}
+		}
 		echo "<script>window.location.replace('?assign=null');</script>";
 	}
 	echo "
@@ -361,10 +377,35 @@ echo "
 									} elseif ($status == "scene") {
 										echo "<b style='color:green'>".$row2["shortName"]."</b>, ";
 									} else {
-										echo "<b>".$row2["shortName"]."</b>, ";
+										echo "<b style='color:grey'>".$row2["shortName"]."</b>, ";
 									}
 								}
 							}
+							echo "<br><br><a href='#incilog' class='btn btn-info' data-toggle='collapse'>Show Incident Log</a>
+							<div id='incilog' class='collapse'>
+								<table class='table'>
+									<thead>
+										<tr>
+											<th>Incident Log</th>
+										</tr>
+									</thead>
+									<tbody>";
+										$sql = "SELECT * FROM Events where Incident = ".$_SESSION["incident"]." ORDER BY ID  DESC";
+										$result3 = $conn->query($sql);
+										if ($result3->num_rows > 0) {
+											// output data of each row
+											while($row3 = $result3->fetch_assoc()) {
+												echo "
+													<tr>
+														<td>".$row3["Event"]."</td>
+													</tr>
+												";
+											}
+										}
+									echo"
+									</tbody>
+								</table>
+							</div>";
 						}
 					} else {
 						echo "<h4 style='color:red;'><b>Error:</b> Failed to find incident. [ECode: INCI-HT404]</h4>";
