@@ -64,7 +64,7 @@
 		</script>
 		<script>
 			if(typeof(EventSource) !== 'undefined') {
-				var source = new EventSource('recieveMayday.php');
+				var source = new EventSource('push/recieveMayday.php');
 				source.onmessage = function(event) {
 					document.getElementById('maydayBanner').innerHTML = '<div class=\"alert alert-danger alert-dismissible\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a><strong>MAYDAY! MAYDAY! MAYDAY!</strong> A Mayday has been declared on your incident.</div>';
 					BootstrapDialog.show({

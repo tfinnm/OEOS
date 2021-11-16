@@ -17,5 +17,8 @@ $sql = "INSERT INTO maydays (Incident) VALUES ('".$_SESSION["incident"]."')";
 		//Again, we need to fail safe here.
 	}
 
+	$logsql = "INSERT INTO events (Incident,Event) VALUES ('".$_SESSION["incident"]."','<b style=\'color:red;\'>MAYDAY DECLARED</b>')";
+	$conn->query($logsql);
+
 	$conn->close();
 ?>

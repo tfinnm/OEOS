@@ -44,7 +44,7 @@ if ($_GET["assign"] == "null") {
 	$_SESSION["incident"] = $_GET["assign"];
 }
 if ($conn->query($sql2) === TRUE) {
-	$sql3 = "SELECT * FROM units WHERE ID = ".$_GET["assign"];
+	$sql3 = "SELECT * FROM units WHERE ID = ".$_SESSION["UnitID"];
 	$result3 = $conn->query($sql3);
 	if ($result3->num_rows > 0) {
 		while($row3 = $result3->fetch_assoc()) {
@@ -381,7 +381,7 @@ echo "
 									}
 								}
 							}
-							echo "<br><br><a href='#incilog' class='btn btn-info' data-toggle='collapse'>Show Incident Log</a>
+							echo "<br><br><a href='#incilog' class='btn btn-info' data-toggle='collapse'>Show Incident Log</a><a href='#comms' class='btn btn-info' data-toggle='collapse'>Show Radio Channels</a>
 							<div id='incilog' class='collapse'>
 								<table class='table'>
 									<thead>
@@ -397,7 +397,35 @@ echo "
 											while($row3 = $result3->fetch_assoc()) {
 												echo "
 													<tr>
-														<td>".$row3["Event"]."</td>
+														<td>".explode(" ",$row3["time"])[1]."  |  ".$row3["Event"]."</td>
+													</tr>
+												";
+											}
+										}
+									echo"
+									</tbody>
+								</table>
+							</div>
+							<div id='comms' class='collapse'>
+								<table class='table'>
+									<thead>
+										<tr>
+											<th>Name</th>
+											<th>Talkgroup</th>
+											<th>Channel</th>
+										</tr>
+									</thead>
+									<tbody>";
+										$sql = "SELECT * FROM radiocomms where IncidentID = ".$_SESSION["incident"];
+										$result3 = $conn->query($sql);
+										if ($result3->num_rows > 0) {
+											// output data of each row
+											while($row3 = $result3->fetch_assoc()) {
+												echo "
+													<tr>
+														<td>".$row3["Name"]."</td>
+														<td>".$row3["Talkgroup"]."</td>
+														<td>".$row3["Channel"]."</td>
 													</tr>
 												";
 											}
@@ -479,14 +507,14 @@ $conn->close();
 </div>
 <script>
 if(typeof(EventSource) !== "undefined") {
-  var source = new EventSource("updateCAD.php");
+  var source = new EventSource("push/updateCAD.php");
   source.onmessage = function(event) {
-	const audio = new Audio("resources/cadUpdate.mp3");
+	const audio = new Audio("resources/dispatch.mp3");
 	audio.play();
 	setTimeout(function(){
 		window.location.href = window.location.href;
 		window.location.reload();
-	}, 2000);
+	}, 9000);
   };
 } else {
   document.write("<meta http-equiv='refresh' content='5'>");
