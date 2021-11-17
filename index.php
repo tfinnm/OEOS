@@ -450,7 +450,7 @@ echo"		</div>
 		</div>
 <div class='panel panel-default'>
   <div class='panel-heading'>Active Incidents</div>
-  <div class='panel-body'>
+  <div id='callList' class='panel-body'>
 	<table class='table table-striped table-hover table-condensed'>
     <thead>
       <tr>
@@ -507,7 +507,7 @@ $conn->close();
 </div>
 <script>
 if(typeof(EventSource) !== "undefined") {
-  var source = new EventSource("push/updateCAD.php");
+  var source = new EventSource("push/dispatch.php");
   source.onmessage = function(event) {
 	const audio = new Audio("resources/dispatch.mp3");
 	audio.play();
@@ -518,5 +518,17 @@ if(typeof(EventSource) !== "undefined") {
   };
 } else {
   document.write("<meta http-equiv='refresh' content='5'>");
+}
+if(typeof(EventSource) !== "undefined") {
+	var source2 = new EventSource("push/updateCADCallList.php");
+	source2.onmessage = function(event) {
+		const audio = new Audio("resources/cadUpdate.mp3");
+		audio.play();
+		if (document.getElementById('callList').innerHTML == event.data) {
+			
+		} else {
+			document.getElementById('callList').innerHTML = event.data;
+		}
+	};
 }
 </script>
