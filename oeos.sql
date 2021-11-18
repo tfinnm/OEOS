@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Oct 15, 2021 at 01:20 PM
+-- Generation Time: Nov 18, 2021 at 11:45 AM
 -- Server version: 5.7.31
 -- PHP Version: 7.3.21
 
@@ -40,6 +40,22 @@ CREATE TABLE IF NOT EXISTS `departments` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `events`
+--
+
+DROP TABLE IF EXISTS `events`;
+CREATE TABLE IF NOT EXISTS `events` (
+  `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Incident` int(11) NOT NULL,
+  `Event` text NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY `ID` (`ID`),
+  KEY `ID_2` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `icsforms`
 --
 
@@ -69,8 +85,39 @@ CREATE TABLE IF NOT EXISTS `incidents` (
   `type` text NOT NULL,
   `details` text NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT '1',
-  UNIQUE KEY `ID` (`ID`)
+  UNIQUE KEY `ID` (`ID`),
+  KEY `ID_2` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `maydays`
+--
+
+DROP TABLE IF EXISTS `maydays`;
+CREATE TABLE IF NOT EXISTS `maydays` (
+  `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Incident` text NOT NULL,
+  `Time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `Active` tinyint(1) NOT NULL DEFAULT '1',
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notification`
+--
+
+DROP TABLE IF EXISTS `notification`;
+CREATE TABLE IF NOT EXISTS `notification` (
+  `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Incident` int(11) NOT NULL,
+  `Content` text NOT NULL,
+  `Issued` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -121,6 +168,22 @@ CREATE TABLE IF NOT EXISTS `personel` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `radiocomms`
+--
+
+DROP TABLE IF EXISTS `radiocomms`;
+CREATE TABLE IF NOT EXISTS `radiocomms` (
+  `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `IncidentID` int(11) NOT NULL,
+  `Name` text NOT NULL,
+  `Talkgroup` text NOT NULL,
+  `Channel` text NOT NULL,
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `units`
 --
 
@@ -138,6 +201,15 @@ CREATE TABLE IF NOT EXISTS `units` (
   `assignable` tinyint(1) NOT NULL,
   UNIQUE KEY `ID` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+DELIMITER $$
+--
+-- Events
+--
+DROP EVENT `clearNotifications`$$
+CREATE DEFINER=`tfinnm`@`%` EVENT `clearNotifications` ON SCHEDULE EVERY 5 MINUTE STARTS '2021-11-18 11:42:33' ON COMPLETION NOT PRESERVE ENABLE DO DELETE FROM notification WHERE Issued < DATE_SUB(NOW(), INTERVAL 10 MINUTE)$$
+
+DELIMITER ;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
