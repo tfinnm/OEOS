@@ -358,14 +358,14 @@ echo "
 								L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {attribution: 'Tiles &copy; Esri'}).addTo(mymap);
 								
 							</script>
-							<div class='col-sm-6'>
+							<div id='callDetails' class='col-sm-6'>
 								<h4><b>Address:</b></h4>
 								".$row["address"]."
 								<h4><b>Call Notes:</b></h4>
 								".$row["details"]."
 							</div>
 							</div>
-							<h4><b>Assigned Units:</b></h4>
+							<h4><b>Assigned Units:</b></h4>	<span id='callUnits'>
 							";
 							$sql2 = "SELECT * FROM units WHERE incidentID = '".$_SESSION["incident"]."'";
 							$result2 = $conn->query($sql2);
@@ -381,7 +381,7 @@ echo "
 									}
 								}
 							}
-							echo "<br><br><a href='#incilog' class='btn btn-info' data-toggle='collapse'>Show Incident Log</a><a href='#comms' class='btn btn-info' data-toggle='collapse'>Show Radio Channels</a>
+							echo "</span><br><br><a href='#incilog' class='btn btn-info' data-toggle='collapse'>Show Incident Log</a><a href='#comms' class='btn btn-info' data-toggle='collapse'>Show Radio Channels</a>
 							<div id='incilog' class='collapse'>
 								<table class='table'>
 									<thead>
@@ -522,12 +522,52 @@ if(typeof(EventSource) !== "undefined") {
 if(typeof(EventSource) !== "undefined") {
 	var source2 = new EventSource("push/updateCADCallList.php");
 	source2.onmessage = function(event) {
-		const audio = new Audio("resources/cadUpdate.mp3");
-		audio.play();
 		if (document.getElementById('callList').innerHTML == event.data) {
 			
 		} else {
 			document.getElementById('callList').innerHTML = event.data;
+		}
+	};
+}
+if(typeof(EventSource) !== "undefined") {
+	var source3 = new EventSource("push/updateCADUnits.php");
+	source3.onmessage = function(event) {
+		if (document.getElementById('callUnits').innerHTML == event.data) {
+			
+		} else {
+			document.getElementById('callUnits').innerHTML = event.data;
+		}
+	};
+}
+if(typeof(EventSource) !== "undefined") {
+	var source4 = new EventSource("push/updateCADLog.php");
+	source4.onmessage = function(event) {
+		if (document.getElementById('incilog').innerHTML == event.data) {
+			
+		} else {
+			document.getElementById('incilog').innerHTML = event.data;
+		}
+	};
+}
+if(typeof(EventSource) !== "undefined") {
+	var source5 = new EventSource("push/updateCADRadio.php");
+	source5.onmessage = function(event) {
+		if (document.getElementById('comms').innerHTML == event.data) {
+			
+		} else {
+			document.getElementById('comms').innerHTML = event.data;
+		}
+	};
+}
+if(typeof(EventSource) !== "undefined") {
+	var source6 = new EventSource("push/updateCADDetails.php");
+	source6.onmessage = function(event) {
+		const audio = new Audio("resources/cadUpdate.mp3");
+		audio.play();
+		if (document.getElementById('callDetails').innerHTML == event.data) {
+			
+		} else {
+			document.getElementById('callDetails').innerHTML = event.data;
 		}
 	};
 }
