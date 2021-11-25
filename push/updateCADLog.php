@@ -32,11 +32,11 @@ $out = "
 								</table>";
 
 $out = str_replace(array("\n", "\r"), '', $out);
-echo "data: ".$out." \n\n";
 
 if ($_SESSION["pushHash"]["CallLog"] == null or $_SESSION["pushHash"]["CallLog"] != crc32($out)) {
 
 	$_SESSION["pushHash"]["CallLog"] = crc32($out);
+	echo "data: ".$out." \n\n";
 	flush();
 	
 }

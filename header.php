@@ -48,6 +48,13 @@
 							</span>        
 						</div>
 					</form> -->
+					<script>
+						function sendMayday(){
+							var ajax = new XMLHttpRequest();
+							ajax.open('POST', '/mayday.php', true);
+							ajax.send();
+						}
+					</script>
 					<ul class=\"nav navbar-nav navbar-right\">
 						<li><a onclick=\"sendMayday()\" href=\"javascript:void(0)\" style=\"background:red;color:white\"><b>!!! MAYDAY !!!</b></a></li>
 					</ul>
@@ -55,17 +62,11 @@
 			</div>
 		</nav>
 		<div id='maydayBanner'></div>
-		<script>
-			function sendMayday(){
-				var ajax = new XMLHttpRequest();
-				ajax.open('POST', 'mayday', true);
-				ajax.send();
-			}
-		</script>
+		<div id='notifBanner'></div>
 		<script>
 			if(typeof(EventSource) !== 'undefined') {
-				var source = new EventSource('push/recieveMayday.php');
-				source.onmessage = function(event) {
+				var source10 = new EventSource('push/recieveMayday.php');
+				source10.onmessage = function(event) {
 					document.getElementById('maydayBanner').innerHTML = '<div class=\"alert alert-danger alert-dismissible\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a><strong>MAYDAY! MAYDAY! MAYDAY!</strong> A Mayday has been declared on your incident.</div>';
 					BootstrapDialog.show({
 						type: BootstrapDialog.TYPE_DANGER,
@@ -79,6 +80,23 @@
 						}]
 					});
 					new Audio('resources/mayday.mp3').play();
+				};
+			}
+			if(typeof(EventSource) !== 'undefined') {
+				var source11 = new EventSource('push/recieveNotification.php');
+				source11.onmessage = function(event) {
+					document.getElementById('notifBanner').innerHTML += '<div class=\"alert alert-info alert-dismissible\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>'+event.data+'</div>';
+					switch (event.data.split(/\\r?\\n/)[0]) {
+						case '0':
+							new Audio('resources/emergency.mp3').play();
+							break;
+						case '1':
+							new Audio('resources/alerttone1.mp3').play();
+							break;
+						case '2':
+							new Audio('resources/alerttone3.mp3').play();
+							break;
+					}
 				};
 			}
 		</script>";

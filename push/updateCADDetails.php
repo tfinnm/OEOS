@@ -22,11 +22,11 @@ if ($result->num_rows > 0) {
 }
 
 $out = str_replace(array("\n", "\r"), '', $out);
-echo "data: ".$out." \n\n";
 
 if ($_SESSION["pushHash"]["CallDetails"] == null or $_SESSION["pushHash"]["CallDetails"] != crc32($out)) {
 
 	$_SESSION["pushHash"]["CallDetails"] = crc32($out);
+	echo "data: ".$out." \n\n";
 	flush();
 	
 }

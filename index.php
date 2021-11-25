@@ -1,6 +1,6 @@
 <?php
 include_once("db.php");
-include("header.php");
+require("header.php");
 if (isset($_GET["logout"])) {
 // Create connection
 $conn = new mysqli($db_server, $db_user, $db_password, $db_db);

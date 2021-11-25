@@ -59,11 +59,11 @@ $out .= "</tbody>
   </table>";
 
 $out = str_replace(array("\n", "\r"), '', $out);
-echo "data: ".$out." \n\n";
 
 if ($_SESSION["pushHash"]["CallList"] == null or $_SESSION["pushHash"]["CallList"] != crc32($out)) {
 
 	$_SESSION["pushHash"]["CallList"] = crc32($out);
+	echo "data: ".$out." \n\n";
 	flush();
 	
 }

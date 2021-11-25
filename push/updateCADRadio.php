@@ -36,11 +36,11 @@ $out = "
 								</table>";
 
 $out = str_replace(array("\n", "\r"), '', $out);
-echo "data: ".$out." \n\n";
 
 if ($_SESSION["pushHash"]["Radio"] == null or $_SESSION["pushHash"]["Radio"] != crc32($out)) {
 
 	$_SESSION["pushHash"]["Radio"] = crc32($out);
+	echo "data: ".$out." \n\n";
 	flush();
 	
 }
