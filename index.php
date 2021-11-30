@@ -326,6 +326,16 @@ echo "
 									}
 								}
 							}
+							$command = "";
+							$sql2 = "SELECT * FROM units WHERE ID = '".$row["commandUnitID"]."'";
+							$result2 = $conn->query($sql2);
+							if ($result2->num_rows > 0) {
+								while($row2 = $result2->fetch_assoc()) {
+									$command = $row2["longName"];
+								}
+							} else {
+								$command = "N/A";
+							}
 							echo "
 							<form action='' method='post'><input type='text' name='statusChange' value='".$ackval."' hidden></input>
 							<table class='table table-compact'>
@@ -334,6 +344,7 @@ echo "
 								<th>Incident ID</th>
 								<th>Time Out</th>
 								<th>Type</th>
+								<th>Command</th>
 								<th>ACK</th>
 							<tr>
 							</thead>
@@ -342,6 +353,7 @@ echo "
 								<td>".$row["ID"]."</td>
 								<td>".$row["timeOut"]."</td>
 								<td>".$row["type"]."</td>
+								<td>".$command."</td>
 								<td>".$ackbutton."</td>
 							</tr>
 							</tbody>
@@ -381,7 +393,7 @@ echo "
 									}
 								}
 							}
-							echo "</span><br><br><a href='#incilog' class='btn btn-info' data-toggle='collapse'>Show Incident Log</a><a href='#comms' class='btn btn-info' data-toggle='collapse'>Show Radio Channels</a>
+							echo "</span><br><br><a href='#incilog' class='btn btn-info' data-toggle='collapse'>Show Incident Log</a><a href='#comms' class='btn btn-info' data-toggle='collapse'>Show Radio Channels</a><a href='#command' class='btn btn-info' data-toggle='collapse'>Show Command Options</a>
 							<div id='incilog' class='collapse'>
 								<table class='table'>
 									<thead>
@@ -433,7 +445,7 @@ echo "
 									echo"
 									</tbody>
 								</table>
-							</div>";
+							</div><div id='command' class='collapse'><br><button class='btn btn-danger'>Assume Command</button></div>";
 						}
 					} else {
 						echo "<h4 style='color:red;'><b>Error:</b> Failed to find incident. [ECode: INCI-HT404]</h4>";

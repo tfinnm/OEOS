@@ -14,6 +14,10 @@
 			<h1><abbr title="Open Emergency Operations Suite"><b style="color:white;">O</b><b style="color:red;">EO</b><b style="color:white;">S</b></abbr><br><small>Canton County</small></h1>
 			<br/>
 			<?php
+			session_start();
+			if (isset($_SESSION["loggedin"])) {
+				die("<script>location.href = '.'</script>");
+			}
 			if (isset($_GET["error"]) && $_GET["error"] == "login") {
 				echo "
 			<div class=\"alert alert-warning alert-dismissible\">

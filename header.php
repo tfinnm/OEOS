@@ -1,6 +1,7 @@
 <?php
 
 	session_start();
+	include_once("db.php");
 	if (!isset($_SESSION["loggedin"])) {
 		die("<script>location.href = 'login.php?error=notlogged'</script>");
 	}
@@ -8,6 +9,19 @@
 	if (!isset($_SESSION["permissions"])) {
 		getPermissions();
 	}
+		
+	$command = false;
+	$conn = new mysqli($db_server, $db_user, $db_password, $db_db);
+	$sql = "SELECT * FROM incidents where ID = ".$_SESSION["incident"];
+	$result = $conn->query($sql);
+	if ($result->num_rows > 0) {
+		while($row = $result->fetch_assoc()) {
+			if ($row["commandUnitID"] == $_SESSION["UnitID"]) {
+				$command = true;
+			}
+		}
+	}
+	$conn->close();
 		
 	print "
 		<meta charset=\"utf-8\">
@@ -35,7 +49,22 @@
 						<li><a href=\".\">Home</a></li>
 		";
 		if ($_SESSION["permissions"]["assign"]) {
-			echo "		<li><a href=\"unitboard\">Dispatch Board</a></li>";
+			echo "		<li><a href=\"dispatch\">Dispatch Board</a></li>";
+		}
+		$commandmayday = "";
+		if ($command) {
+			echo "		<li><a href=\"unitboard\">Unit Board</a></li>";
+			$commandmayday = "					BootstrapDialog.show({
+						type: BootstrapDialog.TYPE_DANGER,
+						title: 'MAYDAY!',
+						message: 'Mayday Declared on your incident, please acknowledge!',
+						buttons: [{
+							label: 'Acknowledge',
+							action: function(dialogItself){
+								dialogItself.close();
+							}
+						}]
+					});";
 		}
 		print "		</ul>
 					<!-- <form class=\"navbar-form navbar-right\" role=\"search\">
@@ -68,17 +97,7 @@
 				var source10 = new EventSource('push/recieveMayday.php');
 				source10.onmessage = function(event) {
 					document.getElementById('maydayBanner').innerHTML = '<div class=\"alert alert-danger alert-dismissible\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a><strong>MAYDAY! MAYDAY! MAYDAY!</strong> A Mayday has been declared on your incident.</div>';
-					BootstrapDialog.show({
-						type: BootstrapDialog.TYPE_DANGER,
-						title: 'MAYDAY!',
-						message: 'Mayday Declared on your incident, please acknowledge!',
-						buttons: [{
-							label: 'Acknowledge',
-							action: function(dialogItself){
-								dialogItself.close();
-							}
-						}]
-					});
+					".$commandmayday."
 					new Audio('resources/mayday.mp3').play();
 				};
 			}
