@@ -25,10 +25,16 @@ if ($conn->query($sql2) === TRUE) {
 }
 $conn->close();
 }
+if (isset($_POST["command"])) {
+	$conn = new mysqli($db_server, $db_user, $db_password, $db_db);
+	$sql2 = "UPDATE incidents SET commandUnitID = ".$_SESSION["UnitID"]." WHERE ID = ".$_SESSION["incident"];
+	if ($conn->query($sql2) === TRUE) {
+	}
+	$conn->close();
+}
 if (isset($_GET["assign"])) {
 // Create connection
 $conn = new mysqli($db_server, $db_user, $db_password, $db_db);
-// Check connection
 if ($conn->connect_error) {
     echo "
 			<div class=\"alert alert-warning alert-dismissible\">
@@ -130,6 +136,11 @@ $conn = new mysqli($db_server, $db_user, $db_password, $db_db);
 				<strong>Error:</strong> A Server Error has Occured. [ECode: UNIT-HT500A]
 			</div>";
 } 
+ 
+ if ($_POST["statusChange"] == "scene") {
+	 $sql = "UPDATE units SET PAR = 1, lastPAR = CURRENT_TIMESTAMP, lastRehab = CURRENT_TIMESTAMP WHERE ID = ".$_SESSION["UnitID"];
+	 $conn->query($sql);
+ }
  
 $sql = "UPDATE units SET status='".$_POST["statusChange"]."' WHERE ID = ".$_SESSION["UnitID"];
  
@@ -445,7 +456,14 @@ echo "
 									echo"
 									</tbody>
 								</table>
-							</div><div id='command' class='collapse'><br><button class='btn btn-danger'>Assume Command</button></div>";
+								<script>
+									function assumeCommand(){
+										var ajax = new XMLHttpRequest();
+										ajax.open('POST', 'index.php', true);
+										ajax.send('command=true');
+									}
+								</script>
+							</div><div id='command' class='collapse'><br><button onClick='assumeCommand()' class='btn btn-danger'>Assume Command</button></div>";
 						}
 					} else {
 						echo "<h4 style='color:red;'><b>Error:</b> Failed to find incident. [ECode: INCI-HT404]</h4>";

@@ -2,6 +2,7 @@
 
 	session_start();
 	include_once("db.php");
+	include_once("options.php");
 	if (!isset($_SESSION["loggedin"])) {
 		die("<script>location.href = 'login.php?error=notlogged'</script>");
 	}
@@ -11,17 +12,19 @@
 	}
 		
 	$command = false;
-	$conn = new mysqli($db_server, $db_user, $db_password, $db_db);
-	$sql = "SELECT * FROM incidents where ID = ".$_SESSION["incident"];
-	$result = $conn->query($sql);
-	if ($result->num_rows > 0) {
-		while($row = $result->fetch_assoc()) {
-			if ($row["commandUnitID"] == $_SESSION["UnitID"]) {
-				$command = true;
+	if ($_SESSION["incident"] != null) {
+		$conn = new mysqli($db_server, $db_user, $db_password, $db_db);
+		$sql = "SELECT * FROM incidents where ID = ".$_SESSION["incident"];
+		$result = $conn->query($sql);
+		if ($result->num_rows > 0) {
+			while($row = $result->fetch_assoc()) {
+				if ($row["commandUnitID"] == $_SESSION["UnitID"]) {
+					$command = true;
+				}
 			}
 		}
+		$conn->close();
 	}
-	$conn->close();
 		
 	print "
 		<meta charset=\"utf-8\">
@@ -42,7 +45,7 @@
 						<span class=\"icon-bar\"></span>
 						<span class=\"icon-bar\"></span>                        
 					</button>
-					<a class=\"navbar-brand\" href=\".\"><abbr title=\"Open Emergency Operations Suite\"><b style=\"color:white;\">O</b><b style=\"color:red;\">EO</b><b style=\"color:white;\">S</b></abbr> <small>Canton County</small></a>
+					<a class=\"navbar-brand\" href=\".\"><abbr title=\"Open Emergency Operations Suite\"><b style=\"color:white;\">O</b><b style=\"color:red;\">EO</b><b style=\"color:white;\">S</b></abbr> <small>".$name."</small></a>
 				</div>
 				<div class=\"collapse navbar-collapse\" id=\"myNavbar\">
 					<ul class=\"nav navbar-nav\">
@@ -53,7 +56,7 @@
 		}
 		$commandmayday = "";
 		if ($command) {
-			echo "		<li><a href=\"unitboard\">Unit Board</a></li>";
+			echo "		<li><a href=\"unitboard\">Command Board</a></li><li><a href=\"worksheet\">Tactical Worksheets</a></li>";
 			$commandmayday = "					BootstrapDialog.show({
 						type: BootstrapDialog.TYPE_DANGER,
 						title: 'MAYDAY!',
@@ -105,17 +108,17 @@
 				var source11 = new EventSource('push/recieveNotification.php');
 				source11.onmessage = function(event) {
 					document.getElementById('notifBanner').innerHTML += '<div class=\"alert alert-info alert-dismissible\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>'+event.data+'</div>';
-					switch (event.data.split(/\\r?\\n/)[0]) {
-						case '0':
-							new Audio('resources/emergency.mp3').play();
-							break;
-						case '1':
-							new Audio('resources/alerttone1.mp3').play();
-							break;
-						case '2':
-							new Audio('resources/alerttone3.mp3').play();
-							break;
-					}
+					//switch (event.data.split(/\\r?\\n/)[0]) {
+					//	case '0':
+					//		new Audio('resources/emergency.mp3').play();
+					//		break;
+					//	case '1':
+					//		new Audio('resources/alerttone1.mp3').play();
+					//		break;
+					//	case '2':
+					//		new Audio('resources/alerttone3.mp3').play();
+					//		break;
+					//}
 				};
 			}
 		</script>";

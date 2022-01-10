@@ -1,0 +1,17 @@
+<div id='mainform'>
+<form>
+  <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike" onClick="if (this.checked) { this.setAttribute('checked', null); } else { this.removeAttribute('checked'); }">
+  <label for="vehicle1"> I have a bike</label><br>
+  <input type="checkbox" id="vehicle2" name="vehicle2" value="Car" onClick="if (this.checked) { this.setAttribute('checked', null); } else { this.removeAttribute('checked'); }">
+  <label for="vehicle2"> I have a car</label><br>
+  <input type="checkbox" id="vehicle3" name="vehicle3" value="Boat" onClick="if (this.checked) { this.setAttribute('checked', null); } else { this.removeAttribute('checked'); }">
+  <label for="vehicle3"> I have a boat</label>
+  <input type=text id='newtest' onChange="this.setAttribute('value', this.value);"></input>
+</form>
+</div>
+<script>
+	function test(){
+		console.log(document.getElementById('mainform').innerHTML);
+		document.getElementById('mainform').innerHTML = document.getElementById('mainform').innerHTML;
+	}
+</script>

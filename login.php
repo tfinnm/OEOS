@@ -11,10 +11,12 @@
 <body style="background:black;">
 	<div class="container">
 		<center>
-			<h1><abbr title="Open Emergency Operations Suite"><b style="color:white;">O</b><b style="color:red;">EO</b><b style="color:white;">S</b></abbr><br><small>Canton County</small></h1>
-			<br/>
 			<?php
-			session_start();
+			include_once("options.php");
+			
+			echo "<h1><abbr title='Open Emergency Operations Suite'><b style='color:white;'>O</b><b style='color:red;'>EO</b><b style='color:white;'>S</b></abbr><br><small>".$name."</small></h1>
+			<br/>";
+			
 			if (isset($_SESSION["loggedin"])) {
 				die("<script>location.href = '.'</script>");
 			}
