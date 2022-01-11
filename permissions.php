@@ -4,6 +4,11 @@
 		$perms = array(
 			"selfassign" => false,
 			"assign" => false,
+			"admin" => false,
+			"musers" => false,
+			"munits" => false,
+			"mperms" => false,
+			"mdepts" => false,
 		);
 		include("db.php");
 		$conn = new mysqli($db_server, $db_user, $db_password, $db_db);
@@ -20,6 +25,22 @@
 				}
 				if ($row["perm.selfassign"] == "1") {
 					$perms["selfassign"] = true;
+				}
+				if ($row["perm.manageusers"] == "1") {
+					$perms["admin"] = true;
+					$perms["musers"] = true;
+				}
+				if ($row["perm.manageunits"] == "1") {
+					$perms["admin"] = true;
+					$perms["munits"] = true;
+				}
+				if ($row["perm.manageperms"] == "1") {
+					$perms["admin"] = true;
+					$perms["mperms"] = true;
+				}
+				if ($row["perm.managedepts"] == "1") {
+					$perms["admin"] = true;
+					$perms["mdepts"] = true;
 				}
 			}
 		}

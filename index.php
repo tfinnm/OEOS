@@ -1,6 +1,7 @@
 <?php
 include_once("db.php");
 require("header.php");
+topbar();
 if (isset($_GET["logout"])) {
 // Create connection
 $conn = new mysqli($db_server, $db_user, $db_password, $db_db);
@@ -125,6 +126,13 @@ if ($result->num_rows > 0) {
 $conn->close();
 }
 echo "<div class='container-fluid'>";
+if (isset($_GET["error"]) && $_GET["error"] == "notadmin") {
+	echo "
+		<div class=\"alert alert-warning alert-dismissible\">
+			<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
+			<strong>Error:</strong> Not Authenticated as Admin [ECode: Auth-HT401]
+		</div>";
+}
 if (isset($_POST["statusChange"])) {
 // Create connection
 $conn = new mysqli($db_server, $db_user, $db_password, $db_db);

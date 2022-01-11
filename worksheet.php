@@ -1,7 +1,7 @@
 <?php
 
 	include("header.php");
-
+	topbar();
 	include("db.php");
 
 	$conn = new mysqli($db_server, $db_user, $db_password, $db_db);

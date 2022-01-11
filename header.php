@@ -1,8 +1,8 @@
 <?php
-
+function topbar($admin = false) {
 	session_start();
-	include_once("db.php");
-	include_once("options.php");
+	include("db.php");
+	include("options.php");
 	if (!isset($_SESSION["loggedin"])) {
 		die("<script>location.href = 'login.php?error=notlogged'</script>");
 	}
@@ -69,17 +69,10 @@
 						}]
 					});";
 		}
+		if ($_SESSION["permissions"]["admin"]) {
+			echo "		<li><a href=\"adminside\">Admin</a></li>";
+		}
 		print "		</ul>
-					<!-- <form class=\"navbar-form navbar-right\" role=\"search\">
-						<div class=\"form-group input-group\">
-							<input type=\"text\" class=\"form-control\" placeholder=\"Search..\">
-							<span class=\"input-group-btn\">
-								<button class=\"btn btn-default\" type=\"button\">
-									<span class=\"glyphicon glyphicon-search\"></span>
-								</button>
-							</span>        
-						</div>
-					</form> -->
 					<script>
 						function sendMayday(){
 							var ajax = new XMLHttpRequest();
@@ -92,8 +85,29 @@
 					</ul>
 				</div>
 			</div>
-		</nav>
-		<div id='maydayBanner'></div>
+		</nav>";
+		if ($admin) {
+			if (!$_SESSION["permissions"]["admin"]) {
+				die("<script>location.href = 'index.php?error=notadmin'</script>");
+			}
+			echo "<div class='container-fluid'> <div class='row'> <div class='col-sm-2 well' style='background-color: #f1f1f1;'>
+					<h2>Admin Panel</h2>
+					<ul class='nav nav-pills nav-stacked'>
+					<li><a href='adminside'>Admin Home</a></li>";
+					if ($_SESSION["permissions"]["musers"]) {
+						echo "<li><a href='usermanage'>User Management</a></li>";
+					}
+					if ($_SESSION["permissions"]["munits"]) {
+						echo "<li><a href='unitmanage'>Unit Management</a></li>";
+					}
+					if ($_SESSION["permissions"]["mdepts"]) {
+						echo "<li><a href='deptmanage'>Department Management</a></li>";
+					}
+					echo "</ul><br>
+			</div>";
+		}
+		
+		print "<div id='maydayBanner'></div>
 		<div id='notifBanner'></div>
 		<script>
 			if(typeof(EventSource) !== 'undefined') {
@@ -124,5 +138,5 @@
 		</script>";
 	
 	//echo $_SERVER['REQUEST_URI'];
-
+}
 ?>
