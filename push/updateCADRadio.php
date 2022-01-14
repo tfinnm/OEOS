@@ -3,6 +3,7 @@ header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache');
 session_start();
 include("../db.php");
+if (isset($_SESSION["incident"]) && $_SESSION["incident"] != null) {
 $conn = new mysqli($db_server, $db_user, $db_password, $db_db);
 if ($conn->connect_error) {
 	// connection failed error goes here
@@ -45,4 +46,5 @@ if ($_SESSION["pushHash"]["Radio"] == null or $_SESSION["pushHash"]["Radio"] != 
 	
 }
 $conn->close();
+}
 ?>
