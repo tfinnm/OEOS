@@ -18,7 +18,7 @@
 				  <tr>
 					<th>UID</th>
 					<th>Username</th>
-					<th>Possition</th>
+					<th>Position</th>
 					<th>Permissions</th>
 					<th>Options</th>
 				  </tr>
