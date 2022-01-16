@@ -18,57 +18,47 @@
 				  <tr>
 					<th>UID</th>
 					<th>Name</th>
-					<th>Department</th>
 					<th>Options</th>
 				  </tr>
 				</thead>
 				<tbody>";
 					
-					$sql = "SELECT * FROM units";
+					$sql = "SELECT * FROM departments";
 					$result = $conn->query($sql);
 					if ($result->num_rows > 0) {
 						while($row = $result->fetch_assoc()) {
-							$sql2 = "SELECT * FROM departments WHERE ID = '".$row["deptID"]."'";
-							$result2 = $conn->query($sql2);
-							$dept = "";
-							if ($result2->num_rows > 0) {
-								while($row2 = $result2->fetch_assoc()) {
-									$dept = $row2["Name"];
-								}
+							$deptColor = "default";
+							switch ($row["Color"]) {
+								case 0:
+									break;
+								case 1:
+									$deptColor = "danger";
+									break;
+								case 2:
+									$deptColor = "info";
+									break;
+								case 3:
+									$deptColor = "info";
+									break;
+								case 4:
+									$deptColor = "success";
+									break;
+								case 5:
+									$deptColor = "warning";
+									break;
+								case 6:
+									$deptColor = "basic";
+									break;
 							}
 							echo "
-							<tr>
+							<tr class='".$deptColor."'>
 								<td>".$row["ID"]."</td>
-								<td>".$row["longName"]." &lt".$row["uname"]."&gt</td>
-								<td>".$dept."</td>
-								<td><span onclick=\"BootstrapDialog.show({
-						type: BootstrapDialog.TYPE_PRIMARY,
-						title: 'Edit Unit &#34".$row["longName"]."&quot',
-						message: '<form></form>',
-						buttons: [{
-							label: 'Cancel',
-							action: function(dialogItself){
-								dialogItself.close();
-							}
-						}]
-					});\" class='glyphicon glyphicon-edit'></span>
-					
-					<span onclick=\"BootstrapDialog.show({
-						type: BootstrapDialog.TYPE_PRIMARY,
-						title: 'Secuirty Options For Unit &#34".$row["longName"]."&quot',
-						message: '<form></form>',
-						buttons: [{
-							label: 'Cancel',
-							action: function(dialogItself){
-								dialogItself.close();
-							}
-						}]
-					});\" class='glyphicon glyphicon-lock'></span>
-
+								<td>".$row["Name"]."</td>
+								<td>
 					<span onclick=\"BootstrapDialog.show({
 						type: BootstrapDialog.TYPE_WARNING,
 						title: 'Confirm Deletion',
-						message: 'Are you Sure you want to delete the unit account &#34".$row["longName"]."&quot?',
+						message: 'Are you Sure you want to delete the department &#34".$row["Name"]."&quot?',
 						buttons: [{
 							label: 'Yes/Confirm',
 							action: function(dialogItself){

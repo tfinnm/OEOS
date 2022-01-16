@@ -14,6 +14,12 @@
 		<p>Administrator Name: ".$adminname."</p>
 		<p>Administrator Email: ".$adminemail."</p>
 		<p>Administrator Phone: ".$adminphone."</p>
+		<br>
+		<h4>Read Only Settings: (Configured in db.php)</h4>
+		<p>SQL Server: ".$db_server."</p>
+		<p>SQL Database: ".$db_db."</p>
+		<p>SQL Username: ".$db_user."</p>
+		<p>SQL Password: ********</p>
 		</div>
 	</div>
 </div>";
