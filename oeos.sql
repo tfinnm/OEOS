@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Nov 18, 2021 at 11:45 AM
+-- Generation Time: Jan 14, 2022 at 11:53 AM
 -- Server version: 5.7.31
 -- PHP Version: 7.3.21
 
@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS `events` (
   `Incident` int(11) NOT NULL,
   `Event` text NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `Display` tinyint(1) DEFAULT '1',
   UNIQUE KEY `ID` (`ID`),
   KEY `ID_2` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -85,6 +86,7 @@ CREATE TABLE IF NOT EXISTS `incidents` (
   `type` text NOT NULL,
   `details` text NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT '1',
+  `commandUnitID` text NOT NULL,
   UNIQUE KEY `ID` (`ID`),
   KEY `ID_2` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -115,6 +117,7 @@ CREATE TABLE IF NOT EXISTS `notification` (
   `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `Incident` int(11) NOT NULL,
   `Content` text NOT NULL,
+  `Tone` int(11) NOT NULL,
   `Issued` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY `ID` (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -153,7 +156,6 @@ CREATE TABLE IF NOT EXISTS `personel` (
   `upass` text NOT NULL,
   `name` text NOT NULL,
   `rankname` text NOT NULL,
-  `ranklevel` int(11) NOT NULL,
   `Unit` int(11) DEFAULT NULL,
   `perm.assign` tinyint(1) NOT NULL,
   `perm.selfassign` tinyint(1) NOT NULL,
@@ -174,10 +176,27 @@ CREATE TABLE IF NOT EXISTS `personel` (
 DROP TABLE IF EXISTS `radiocomms`;
 CREATE TABLE IF NOT EXISTS `radiocomms` (
   `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `IncidentID` int(11) NOT NULL,
+  `IncidentID` int(11) DEFAULT NULL,
   `Name` text NOT NULL,
   `Talkgroup` text NOT NULL,
   `Channel` text NOT NULL,
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tacticalworksheets`
+--
+
+DROP TABLE IF EXISTS `tacticalworksheets`;
+CREATE TABLE IF NOT EXISTS `tacticalworksheets` (
+  `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Incident` text NOT NULL,
+  `Name` text NOT NULL,
+  `SketchData` text NOT NULL,
+  `SideForm` text NOT NULL,
+  `MainForm` text NOT NULL,
   UNIQUE KEY `ID` (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -195,12 +214,29 @@ CREATE TABLE IF NOT EXISTS `units` (
   `longName` text NOT NULL,
   `shortName` text NOT NULL,
   `deptID` int(11) NOT NULL,
-  `crewCap` int(11) NOT NULL,
   `status` text NOT NULL,
   `incidentID` int(11) DEFAULT NULL,
   `assignable` tinyint(1) NOT NULL,
+  `lastPAR` timestamp NOT NULL,
+  `PAR` tinyint(1) NOT NULL,
+  `lastRehab` timestamp NOT NULL,
   UNIQUE KEY `ID` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `worksheettemplates`
+--
+
+DROP TABLE IF EXISTS `worksheettemplates`;
+CREATE TABLE IF NOT EXISTS `worksheettemplates` (
+  `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Name` text NOT NULL,
+  `SideForm` text NOT NULL,
+  `MainForm` text NOT NULL,
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 DELIMITER $$
 --
