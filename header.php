@@ -69,6 +69,9 @@ function topbar($admin = false) {
 						}]
 					});";
 		}
+		if ($_SESSION["permissions"]["ems"]) {
+			echo "		<li><a href=\"ems\">EMS</a></li>";
+		}
 		if ($_SESSION["permissions"]["admin"]) {
 			echo "		<li><a href=\"adminside\">Admin</a></li>";
 		}

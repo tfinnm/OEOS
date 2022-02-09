@@ -3,6 +3,7 @@
 	{
 		$perms = array(
 			"selfassign" => false,
+			"ems" => false,
 			"assign" => false,
 			"admin" => false,
 			"musers" => false,
@@ -22,6 +23,9 @@
 			while($row = $result->fetch_assoc()) {
 				if ($row["perm.assign"] == "1") {
 					$perms["assign"] = true;
+				}
+				if ($row["perm.ems"] == "1") {
+					$perms["ems"] = true;
 				}
 				if ($row["perm.selfassign"] == "1") {
 					$perms["selfassign"] = true;

@@ -194,6 +194,10 @@ $conn->close();
 		$conn->close();
 ?>
 <center>
+<a href="newcall" onclick="window.open('newcall', 
+                         'newwindow', 
+                         'width=305,height=400'); 
+              return false;">New Call</a>
 <form class="form-inline" action="#">
   <div class="form-group">
     <label for="quick">Quick Assign:</label>

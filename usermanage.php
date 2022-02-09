@@ -33,6 +33,9 @@
 							if ($row["perm.assign"] == 1) {
 								$permissions .= "<abbr title = 'Assign/Dispatch'><span class='glyphicon glyphicon-phone-alt'> </span></abbr> ";
 							}
+							if ($row["perm.ems"] == 1) {
+								$permissions .= "<abbr title = 'EMS'><span class='glyphicon glyphicon-heart'> </span></abbr> ";
+							}
 							if ($row["perm.selfassign"] == 1) {
 								$permissions .= "<abbr title = 'Self-Assign/Self-Dispatch'><span class='glyphicon glyphicon-check'> </span></abbr> ";
 							}

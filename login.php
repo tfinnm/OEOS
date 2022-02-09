@@ -63,7 +63,7 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<div class="wrapper">
+						<!--<div class="wrapper">
 							<canvas id="signature-pad" class="signature-pad" width=400 height=200></canvas>
 							<script>
 								var canvas = document.getElementById('signature-pad');
@@ -72,7 +72,7 @@
 								});
 							</script>
 							<p><b>Sign Here</b> (Patient Signiture)</p>
-						</div>
+						</div>-->
 						<button type="submit" class="btn btn-default">Log In</button>
 					</div>
 				</form>
