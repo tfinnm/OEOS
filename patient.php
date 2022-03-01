@@ -79,18 +79,18 @@ echo"		</div>
 								'I refuse:'+
 								'<center>'+
 									'<label class=\'radio-inline\'>'+
-										'<input type=\'radio\' name=\'refuseType\' required>Evaluation'+
+										'<input type=\'radio\' name=\'refuseType\' value=\'eval\' required>Evaluation'+
 									'</label>'+
 									'<label class=\'radio-inline\'>'+
-										'<input type=\'radio\' name=\'refuseType\' required>Treatment'+
+										'<input type=\'radio\' name=\'refuseType\' value=\'treat\' required>Treatment'+
 									'</label>'+
 									'<label class=\'radio-inline\'>'+
-										'<input type=\'radio\' name=\'refuseType\' required>Transport'+
+										'<input type=\'radio\' name=\'refuseType\' value=\'trans\' required>Transport'+
 									'</label>'+
 								'</center>'+
 								'<br>'+
 								'<center>'+
-									'<input id=\'signatureinput\' hidden required></input>'+
+									'<input type=\'text\' id=\'signatureinput\' name=\'signatureinput\' hidden required></input>'+
 									'<div class=\'wrapper\'>'+
 										'<canvas style=\'outline: 1px solid black;\' id=\'signature-pad\' class=\'signature-pad\' width=400 height=200></canvas>'+
 										'<script>'+
