@@ -110,9 +110,22 @@ function topbar($admin = false) {
 			</div>";
 		}
 		
-		print "<div id='maydayBanner'></div>
+		echo "<div id='maydayBanner'></div>
 		<div id='notifBanner'></div>
 		<script>
+			if(typeof(EventSource) !== 'undefined') {
+				var source = new EventSource('push/dispatch.php');
+				source.onmessage = function(event) {
+					const audio = new Audio('resources/dispatch.mp3');
+					audio.play();
+					setTimeout(function(){
+						window.location.href = window.location.href;
+						window.location.reload();
+					}, 9000);
+				};
+			} else {
+				document.write(\"<meta http-equiv='refresh' content='5'>\");
+			}
 			if(typeof(EventSource) !== 'undefined') {
 				var source10 = new EventSource('push/recieveMayday.php');
 				source10.onmessage = function(event) {

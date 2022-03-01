@@ -49,15 +49,11 @@ if (empty($_GET)) {
 		$sql2 = "UPDATE units SET incidentID = ".$last_id.", status = 'dispatched' WHERE ID = ".$_SESSION["UnitID"];
 		$_SESSION["incident"] = $last_id;
 		$conn->query($sql2);
+		echo "<script>window.close()</script>";
 	} else {
 		echo "Error: " . $sql . "<br>" . $conn->error;
 	}
-
-	
-
 	$conn->close();
-	
-	echo "<script>window.close()</script>";
 }
 
 ?>

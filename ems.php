@@ -6,7 +6,17 @@ echo"
 	<div class='col-sm-5'>
 		<div class='panel panel-info'>
 			<div class='panel-heading'>Patients</div>
-			<div class='panel-body'>";
+			<div class='panel-body'>  <button onclick=\"BootstrapDialog.show({
+						type: BootstrapDialog.TYPE_PRIMARY,
+						title: 'New Patient',
+						message: '<form><input></input></form>',
+						buttons: [{
+							label: 'Close',
+							action: function(dialogItself){
+								dialogItself.close();
+							}
+						}]
+					});;\">New Patient</button>";
 			if ($_SESSION["incident"] != null) {
 				echo"<table class='table table-striped table-hover'>
 					<thead>
@@ -43,8 +53,8 @@ echo"
 										break;
 								}
 								echo "
-									<tr>
-										<td><span class='label ".$triagecolor."'>".$triagename."</span> ".$row["firstName"]." ".$row["lastName"]." (".$row["age"]."M)</td>
+									<tr onclick=\"location.href = 'patient?id=".$row["ID"]."'\">
+										<td><span class='label ".$triagecolor."'>".$triagename."</span> <abbr title='".$row["triageTag"]."'>".$row["firstName"]." ".$row["lastName"]."</abbr> (".$row["age"]."M)</td>
 										<td>".$row["chiefComplaint"]."</td>
 										<td>".$row["status"]."</td>
 									</tr>
@@ -73,8 +83,9 @@ echo"		</div>
 						$minor = 0;
 						$delayed = 0;
 						$immediate = 0;
+						$total = 0;
 						$conn = new mysqli($db_server, $db_user, $db_password, $db_db);
-						$sql = "SELECT SUM(CASE WHEN triage = 4 THEN 1 ELSE 0 END) AS deceased, SUM(CASE WHEN triage = 0 THEN 1 ELSE 0 END) AS unknown, SUM(CASE WHEN triage = 1 THEN 1 ELSE 0 END) AS immediate, SUM(CASE WHEN triage = 2 THEN 1 ELSE 0 END) AS yellow, SUM(CASE WHEN triage = 3 THEN 1 ELSE 0 END) AS minor FROM patients WHERE Incident = ".$_SESSION["incident"];
+						$sql = "SELECT COUNT(ID) as total, SUM(CASE WHEN triage = 4 THEN 1 ELSE 0 END) AS deceased, SUM(CASE WHEN triage = 0 THEN 1 ELSE 0 END) AS unknown, SUM(CASE WHEN triage = 1 THEN 1 ELSE 0 END) AS immediate, SUM(CASE WHEN triage = 2 THEN 1 ELSE 0 END) AS yellow, SUM(CASE WHEN triage = 3 THEN 1 ELSE 0 END) AS minor FROM patients WHERE Incident = ".$_SESSION["incident"];
 						$result = $conn->query($sql);
 						if ($result->num_rows > 0) {
 							while($row = $result->fetch_assoc()) {
@@ -83,10 +94,31 @@ echo"		</div>
 								$minor = $row["minor"];
 								$delayed = $row["yellow"];
 								$immediate = $row["immediate"];
+								$total = $row["total"];
 							}
 						}
 						$conn->close();
+						if ($total < 1) {
+							$total = 1;
+						}
 						echo "
+					<div class='progress'>
+						<div class='progress-bar progress-bar-success' role='progressbar' style='width:".(100*($minor/$total))."%'>
+							Minor
+						</div>
+						<div class='progress-bar progress-bar-warning' role='progressbar' style='width:".(100*($delayed/$total))."%'>
+							Delayed
+						</div>
+						<div class='progress-bar progress-bar-danger' role='progressbar' style='width:".(100*($immediate/$total))."%'>
+							Immediate
+						</div>
+						<div class='progress-bar progress-bar-default' role='progressbar' style='width:".(100*($deceased/$total))."%'>
+							Deceased
+						</div>
+						<div class='progress-bar progress-bar-primary' role='progressbar' style='width:".(100*($unknown/$total))."%'>
+							Unknown
+						</div>
+					</div>
 					<ul class='list-group'>
 						<div class='col-sm-6'>
 							<li class='list-group-item list-group-item-danger'>Immediate <span class='badge'>".$immediate."</span></li>
@@ -157,7 +189,7 @@ echo "			</div>
 									$capm .= "<span class=\'label label-warning\'>STEMI</span> ";
 								}
 								if ($row["Stroke"] > 0) {
-									$capt .= "<span class='label label-warning'>Stoke</span> ";
+									$capt .= "<span class='label label-warning'>Stroke</span> ";
 									$capm .= "<span class=\'label label-warning\'>Stroke</span> ";
 								}
 

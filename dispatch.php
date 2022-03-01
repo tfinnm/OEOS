@@ -2,7 +2,7 @@
 	include("header.php");
 	topbar();
 	include("db.php");
-		
+	$_SESSION["dispatchrIncident"] = $_SESSION["incident"];
 if (isset($_GET["assign"])) {
 // Create connection
 $conn = new mysqli($db_server, $db_user, $db_password, $db_db);
@@ -224,3 +224,12 @@ $conn->close();
 	<?php echo $boxes; ?>
   </div>
 </div><br>
+<script>
+			if(typeof(EventSource) !== 'undefined') {
+				var source31 = new EventSource('push/dispatcher.php');
+				source31.onmessage = function(event) {
+					window.location.href = window.location.href;
+					window.location.reload();
+				};
+			}
+</script>

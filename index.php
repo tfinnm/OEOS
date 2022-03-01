@@ -545,19 +545,6 @@ $conn->close();
 </div>
 <script>
 if(typeof(EventSource) !== "undefined") {
-  var source = new EventSource("push/dispatch.php");
-  source.onmessage = function(event) {
-	const audio = new Audio("resources/dispatch.mp3");
-	audio.play();
-	setTimeout(function(){
-		window.location.href = window.location.href;
-		window.location.reload();
-	}, 9000);
-  };
-} else {
-  document.write("<meta http-equiv='refresh' content='5'>");
-}
-if(typeof(EventSource) !== "undefined") {
 	var source2 = new EventSource("push/updateCADCallList.php");
 	source2.onmessage = function(event) {
 		if (document.getElementById('callList').innerHTML == event.data) {

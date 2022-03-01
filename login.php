@@ -63,16 +63,6 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<!--<div class="wrapper">
-							<canvas id="signature-pad" class="signature-pad" width=400 height=200></canvas>
-							<script>
-								var canvas = document.getElementById('signature-pad');
-								var signaturePad = new SignaturePad(canvas, {
-									backgroundColor: 'rgb(255, 255, 255)' // necessary for saving image as JPEG; can be removed is only saving as PNG or SVG
-								});
-							</script>
-							<p><b>Sign Here</b> (Patient Signiture)</p>
-						</div>-->
 						<button type="submit" class="btn btn-default">Log In</button>
 					</div>
 				</form>
