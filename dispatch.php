@@ -196,12 +196,12 @@ $conn->close();
 <center>
 <a href="newcall" onclick="window.open('newcall', 
                          'newwindow', 
-                         'width=305,height=400'); 
+                         'width=305,height=475'); 
               return false;">New Call</a>
 <form class="form-inline" action="#">
   <div class="form-group">
     <label for="quick">Quick Assign:</label>
-    <select class="form-control" id="quick">
+    <select class="form-control" name="assign" id="quick">
 		<?php echo $quick; ?>
 	</select>
   </div>
