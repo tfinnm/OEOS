@@ -304,14 +304,23 @@ if ($result->num_rows > 0) {
 echo "
     </tbody>
   </table>
-  <form class='form-inline' action='' method='post'>
-  <div class='form-group'>
-    <input required type='text' class='form-control' id='usrnm' name='usrnm' placeholder='Enter username'>
-  </div>
-  <div class='form-group'>
-    <input required type='password' class='form-control' id='pwd' name='pswrd' placeholder='Enter password'>
-  </div>
-  <button type='submit' class='btn btn-default'>Log In</button>
+<form class='form-inline' action='' method='post'>
+	<div class='form-group'>
+		<input required type='text' class='form-control' id='usrnm' name='usrnm' placeholder='Enter username'>
+	</div>
+	<div class='form-group'>
+		<input required type='password' class='form-control' id='pwd' name='pswrd' placeholder='Enter password'>
+	</div>
+	<button type='submit' class='btn btn-default'>Log In</button>
+	<button class='btn btn-danger dropdown-toggle' type='button' data-toggle='dropdown'>Menu<span class='caret'></span></button>
+	<ul class='dropdown-menu'>
+		<li class='dropdown-header'>Unit</li>
+		<li><a href='logout.php'>Logout</a></li>
+		<li class='divider'></li>
+		<li class='dropdown-header'>Tools</li>
+		<li><a href='hospital'>Hospital Portal</a></li>
+		<li><a href='selfserve'>Self-Serivce</a></li>
+	</ul>
 </form>
 </div>
 </div>
@@ -481,6 +490,33 @@ echo "
 					<center>
 						<h4>No Assigned Incident</h4>
 					</center>
+					<hr>
+					<table class='table'>
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Talkgroup</th>
+								<th>Channel</th>
+							</tr>
+						</thead>
+						<tbody>";
+							$sql = "SELECT * FROM radiocomms where IncidentID = -1";
+							$result3 = $conn->query($sql);
+							if ($result3->num_rows > 0) {
+								// output data of each row
+								while($row3 = $result3->fetch_assoc()) {
+									echo "
+										<tr>
+											<td>".$row3["Name"]."</td>
+											<td>".$row3["Talkgroup"]."</td>
+											<td>".$row3["Channel"]."</td>
+										</tr>
+									";
+								}
+							}
+						echo"
+						</tbody>
+					</table>
 					";
 				}
 			

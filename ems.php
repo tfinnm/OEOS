@@ -54,7 +54,7 @@ echo"
 								}
 								echo "
 									<tr onclick=\"location.href = 'patient?id=".$row["ID"]."'\">
-										<td><span class='label ".$triagecolor."'>".$triagename."</span> <abbr title='".$row["triageTag"]."'>".$row["firstName"]." ".$row["lastName"]."</abbr> (".$row["age"]."M)</td>
+										<td><span class='label ".$triagecolor."'>".$triagename."</span> <abbr title='".$row["triageTag"]."'>".$row["firstName"]." ".$row["lastName"]."</abbr> (".$row["age"].$row["gender"].")</td>
 										<td>".$row["chiefComplaint"]."</td>
 										<td>".$row["status"]."</td>
 									</tr>
@@ -112,7 +112,7 @@ echo"		</div>
 						<div class='progress-bar progress-bar-danger' role='progressbar' style='width:".(100*($immediate/$total))."%'>
 							Immediate
 						</div>
-						<div class='progress-bar progress-bar-default' role='progressbar' style='width:".(100*($deceased/$total))."%'>
+						<div class='progress-bar' role='progressbar' style='width:".(100*($deceased/$total))."%'>
 							Deceased
 						</div>
 						<div class='progress-bar progress-bar-primary' role='progressbar' style='width:".(100*($unknown/$total))."%'>
