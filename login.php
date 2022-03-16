@@ -3,10 +3,10 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js"></script>
+	<?php
+		include("header.php");
+		bootlibs();
+	?>
 </head>
 <body style="background:black;">
 	<div class="container">
@@ -31,6 +31,12 @@
 			<div class=\"alert alert-success alert-dismissible\">
 				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
 				<strong>Success:</strong> Successfully Logged Out.
+			</div>";
+			} elseif (isset($_GET["error"]) && $_GET["error"] == "pswrdcng") {
+				echo "
+			<div class=\"alert alert-success alert-dismissible\">
+				<a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>
+				<strong>Success:</strong> Password Changed Successfully.
 			</div>";
 			} elseif (isset($_GET["error"]) && $_GET["error"] == "server") {
 				echo "
@@ -66,6 +72,8 @@
 						<button type="submit" class="btn btn-default">Log In</button>
 					</div>
 				</form>
+				<br>
+				<a href="hospital/login">Hospital Login</a> | <a href="selfserve">Self-Service Portal</a>
 			</div>
 		</center>
 	</div>
