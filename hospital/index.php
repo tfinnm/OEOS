@@ -168,7 +168,7 @@ if (isset($_GET["error"]) && $_GET["error"] == "notadmin") {
 										title: 'Recieve Patient ".$row["lastName"].", ".$row["firstName"]." ".$row["middleInitial"]." (".$row["age"].$row["gender"].")',
 										message: '<form> <b>Patient: </b>".$row["lastName"].", ".$row["firstName"]." ".$row["middleInitial"]." (".$row["age"].$row["gender"].")<br><b>Triage Tag: </b>".$row["triageTag"]."<br><b>Chief Complaint: </b>".$row["chiefComplaint"]."'+
 								'<br><br><label class=\'checkbox-inline\'><input type=\'checkbox\' value=\'confirm\' required>This is the correct patient.</label><hr>'+ 
-								'By signing, I confirm that I have been transfored care of this patient from EMS and that I am responsible for the patient\'s care.'+			
+								'By signing, I confirm that I have been transferred care of this patient from EMS and that I assume responsibility for this patient and their care.'+			
 								'<br>'+
 								'<center>'+
 									'<input type=\'text\' id=\'signatureinput\' name=\'signatureinput\' hidden required></input>'+
