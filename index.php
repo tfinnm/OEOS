@@ -312,7 +312,7 @@ echo "
 		<input required type='password' class='form-control' id='pwd' name='pswrd' placeholder='Enter password'>
 	</div>
 	<button type='submit' class='btn btn-default'>Log In</button>
-	<button class='btn btn-danger dropdown-toggle' type='button' data-toggle='dropdown'>Menu<span class='caret'></span></button>
+	<button class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown'>Menu<span class='caret'></span></button>
 	<ul class='dropdown-menu'>
 		<li class='dropdown-header'>Unit</li>
 		<li><a href='logout.php'>Logout</a></li>
