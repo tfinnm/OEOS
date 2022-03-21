@@ -26,12 +26,60 @@ if ($conn->query($sql2) === TRUE) {
 }
 $conn->close();
 }
-if (isset($_POST["command"])) {
+if (isset($_GET["command"])) {
+	if ($_SESSION["permissions"]["command"]) {
 	$conn = new mysqli($db_server, $db_user, $db_password, $db_db);
 	$sql2 = "UPDATE incidents SET commandUnitID = ".$_SESSION["UnitID"]." WHERE ID = ".$_SESSION["incident"];
 	if ($conn->query($sql2) === TRUE) {
+	$sql3 = "SELECT * FROM units WHERE ID = ".$_SESSION["UnitID"];
+	$result3 = $conn->query($sql3);
+	if ($result3->num_rows > 0) {
+		while($row3 = $result3->fetch_assoc()) {
+			$logsql = "INSERT INTO events (Incident,Event) VALUES ('".$_SESSION["incident"]."','".$row3["shortName"]." assumed command')";
+			$conn->query($logsql);
+		}
+	}
+}
+	$conn->close();
+}
+	echo "<script>window.location.replace('.');</script>";
+	die();
+}
+if (isset($_GET["termcommand"])) {
+	$conn = new mysqli($db_server, $db_user, $db_password, $db_db);
+	$sql2 = "UPDATE incidents SET commandUnitID = null WHERE ID = ".$_SESSION["incident"];
+	if ($conn->query($sql2) === TRUE) {
+	$sql3 = "SELECT * FROM units WHERE ID = ".$_SESSION["UnitID"];
+	$result3 = $conn->query($sql3);
+	if ($result3->num_rows > 0) {
+		while($row3 = $result3->fetch_assoc()) {
+			$logsql = "INSERT INTO events (Incident,Event) VALUES ('".$_SESSION["incident"]."','".$row3["shortName"]." terminated/released command')";
+			$conn->query($logsql);
+		}
 	}
 	$conn->close();
+}
+	echo "<script>window.location.replace('.');</script>";
+	die();
+}
+if (isset($_GET["terminci"])) {
+	$conn = new mysqli($db_server, $db_user, $db_password, $db_db);
+	$sql2 = "UPDATE incidents SET active = 0 WHERE ID = ".$_SESSION["incident"];
+	if ($conn->query($sql2) === TRUE) {
+	$sql3 = "SELECT * FROM units WHERE ID = ".$_SESSION["UnitID"];
+	$result3 = $conn->query($sql3);
+	if ($result3->num_rows > 0) {
+		while($row3 = $result3->fetch_assoc()) {
+			$logsql = "INSERT INTO events (Incident,Event) VALUES ('".$_SESSION["incident"]."','Incident Ended')";
+			$conn->query($logsql);
+		}
+	}
+	$notifsql = "INSERT INTO notification (Incident,Content,Tone) VALUES ('".$_SESSION["incident"]."','Incident Ended','-1')";
+	$conn->query($notifsql);
+	$conn->close();
+}
+	echo "<script>window.location.replace('.');</script>";
+	die();
 }
 if (isset($_GET["assign"])) {
 // Create connection
@@ -60,6 +108,7 @@ if ($conn->query($sql2) === TRUE) {
 		}
 	}
 	echo "<script>window.location.replace('.');</script>";
+	die();
 } else {
 	echo "
 	<div class=\"alert alert-warning alert-dismissible\">
@@ -355,6 +404,10 @@ echo "
 								}
 							}
 							$command = "";
+							$iscommand = false;
+							if ($row["commandUnitID"] == $_SESSION["UnitID"]) {
+								$iscommand = true;
+							}
 							$sql2 = "SELECT * FROM units WHERE ID = '".$row["commandUnitID"]."'";
 							$result2 = $conn->query($sql2);
 							if ($result2->num_rows > 0) {
@@ -473,14 +526,16 @@ echo "
 									echo"
 									</tbody>
 								</table>
-								<script>
-									function assumeCommand(){
-										var ajax = new XMLHttpRequest();
-										ajax.open('POST', 'index.php', true);
-										ajax.send('command=true');
-									}
-								</script>
-							</div><div id='command' class='collapse'><br><button onClick='assumeCommand()' class='btn btn-danger'>Assume Command</button></div>";
+							</div><div id='command' class='collapse'><br>";
+							if ($iscommand) {
+								echo "<a href='?terminci=true' class='btn btn-danger'>Close Incident</a> ";
+								echo " <a href='?termcommand=true' class='btn btn-danger'>Terminate Command</a>";
+							} elseif ($_SESSION["permissions"]["command"]) {
+								echo "<a href='?command=true' class='btn btn-danger'>Assume Command</a>";
+							} else {
+								echo "No options available.";
+							}
+							echo "</div>";
 						}
 					} else {
 						echo "<h4 style='color:red;'><b>Error:</b> Failed to find incident. [ECode: INCI-HT404]</h4>";
