@@ -1,7 +1,20 @@
 <?php
+include("db.php");
 	include("header.php");
 	topbar();
-	include("db.php");
+
+if (isset($_GET["notif"])) {
+	$conn = new mysqli($db_server, $db_user, $db_password, $db_db);
+	$notifsql = "INSERT INTO notification (Incident,Content,Tone) VALUES ('".$_SESSION["incident"]."','".$_GET["notif"]."','".$_GET["notiftone"]."')";
+	$conn->query($notifsql);
+	if (isset($_GET["log"])) {
+		$logsql = "INSERT INTO events (Incident,Event) VALUES ('".$_SESSION["incident"]."','".$_GET["notif"]."')";
+		$conn->query($logsql);
+	}
+	$conn->close();
+	echo "<script>window.location.replace('unitboard');</script>";
+	die();
+}
 		
 		$conn = new mysqli($db_server, $db_user, $db_password, $db_db);
 		// Check connection
@@ -41,20 +54,20 @@
 							</div>
 						</div>
 						<div class='col-sm-3'>
-							<form class='form-horizontal' action='/action_page.php'>
+							<form class='form-horizontal'>
 								<div class='form-group'>
 									<label class='control-label col-sm-2' for='msg'>Message:</label>
 									<div class='col-sm-10'>
-										<input type='text' class='form-control' id='msg' placeholder='Message' name='msg'>
+										<input type='text' class='form-control' id='msg' placeholder='Message' name='notif'>
 									</div>
 								</div>
 								<div class='form-group'>
 									<label class='col-sm-2' for='tone'>Select Tone:</label>
 									<div class='col-sm-5'>
-										<select class='form-control' id='tone'>
-											<option value='0'>Emergency</option>
-											<option value='2'>Priority 1</option>
-											<option value='1'>Priority 2</option>
+										<select class='form-control' id='tone' name='notiftone'>
+											<option value='0'>Tone 0</option>
+											<option value='2'>Tone 1</option>
+											<option value='1'>Tone 2</option>
 										</select>
 									</div>								
 								  <div class='col-sm-2'>
@@ -71,8 +84,8 @@
 						<div class='col-sm-2'>
 							<div class='well'>
 								<center>
-									<button type='button' class='btn btn-warning'>EVACUATE</button> <br><br>
-									<button type='button' class='btn btn-danger'>ABANDON</button>
+									<a href='?notif=EVACUATE!%20EVACUATE!%20EVACUATE!&notiftone=1&log=true' class='btn btn-warning'>EVACUATE</a> <br><br>
+									<a href='?notif=!!!ABANDON!!!%20!!!ABANDON!!!%20!!!ABANDON!!!&notiftone=2&log=true' class='btn btn-danger>ABANDON</a>
 								</center>
 							</div>
 						</div>
