@@ -35,7 +35,7 @@ function topbar($admin = false) {
 		getPermissions();
 	}
 		
-	$command = false;
+	$iscommand = false;
 	if ($_SESSION["incident"] != null) {
 		$conn = new mysqli($db_server, $db_user, $db_password, $db_db);
 		$sql = "SELECT * FROM incidents where ID = ".$_SESSION["incident"];
@@ -43,7 +43,7 @@ function topbar($admin = false) {
 		if ($result->num_rows > 0) {
 			while($row = $result->fetch_assoc()) {
 				if ($row["commandUnitID"] == $_SESSION["UnitID"]) {
-					$command = true;
+					$iscommand = true;
 				}
 			}
 		}
@@ -71,7 +71,7 @@ function topbar($admin = false) {
 			echo "		<li><a href=\"dispatch\">Dispatch Board</a></li>";
 		}
 		$commandmayday = "";
-		if ($command) {
+		if ($iscommand) {
 			echo "		<li><a href=\"unitboard\">Command Board</a></li><li><a href=\"worksheet\">Tactical Worksheets</a></li>";
 			$commandmayday = "					BootstrapDialog.show({
 						type: BootstrapDialog.TYPE_DANGER,
@@ -153,18 +153,22 @@ function topbar($admin = false) {
 			if(typeof(EventSource) !== 'undefined') {
 				var source11 = new EventSource('push/recieveNotification.php');
 				source11.onmessage = function(event) {
-					document.getElementById('notifBanner').innerHTML += '<div class=\"alert alert-info alert-dismissible\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>'+event.data+'</div>';
-					//switch (event.data.split(/\\r?\\n/)[0]) {
-					//	case '0':
-					//		new Audio('resources/emergency.mp3').play();
-					//		break;
-					//	case '1':
-					//		new Audio('resources/alerttone1.mp3').play();
-					//		break;
-					//	case '2':
-					//		new Audio('resources/alerttone3.mp3').play();
-					//		break;
-					//}
+					var notifi = event.data.split(/\\r?\\n/);
+					document.getElementById('notifBanner').innerHTML += '<div class=\"alert alert-info alert-dismissible\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>'+event.data.split(/\\r?\\n/)[1]+'</div>';
+					switch (event.data.split(/\\r?\\n/)[0]) {
+						case '-1':
+							new Audio('resources/cadUpdate.mp3').play();
+							break;
+						case '0':
+							new Audio('resources/emergency.mp3').play();
+							break;
+						case '1':
+							new Audio('resources/alerttone1.mp3').play();
+							break;
+						case '2':
+							new Audio('resources/alerttone3.mp3').play();
+							break;
+					}
 				};
 			}
 		</script>";
