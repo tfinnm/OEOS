@@ -6,6 +6,7 @@
 			"ems" => false,
 			"assign" => false,
 			"admin" => false,
+			"command" => false,
 			"musers" => false,
 			"munits" => false,
 			"mperms" => false,
@@ -29,6 +30,9 @@
 				}
 				if ($row["perm.selfassign"] == "1") {
 					$perms["selfassign"] = true;
+				}
+				if ($row["perm.command"] == "1") {
+					$perms["command"] = true;
 				}
 				if ($row["perm.manageusers"] == "1") {
 					$perms["admin"] = true;
