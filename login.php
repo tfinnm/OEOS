@@ -73,7 +73,7 @@
 					</div>
 				</form>
 				<br>
-				<a href="hospital/login">Hospital Login</a> | <a href="selfserve">Self-Service Portal</a>
+				<a href="hospital/login">Hospital Login</a> | <a href="selfserve">Self-Service Portal</a> | <a href="station">Station Board</a>
 			</div>
 		</center>
 	</div>
@@ -109,6 +109,8 @@ $conn->close();
 		$_SESSION["loggedin"] = true;
 		$_SESSION["UnitID"] = $id;
 		$_SESSION["incident"] = $incident;
+		$_SESSION["NotifID"] = -1;
+		$_SESSION["maydayID"] = -1;
 		echo ("<script>location.href = '.'</script>");
 	}else {
 		die("<script>location.href = '?error=login'</script>");
