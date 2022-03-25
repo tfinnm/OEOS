@@ -452,12 +452,15 @@ echo "
 							<script src='libraries/leaflet/leaflet.js'></script>
 							<link rel='stylesheet' href='libraries\leaflet-pulsingicon/L.Icon.Pulse.min.css'/>
 							<script src='libraries\leaflet-pulsingicon/L.Icon.Pulse.min.js'></script>
+							<script src='libraries\leaflet-fullscreen\Leaflet.fullscreen.min.js'></script>
+							<link href='libraries\leaflet-fullscreen\leaflet.fullscreen.css' rel='stylesheet' />
 							<div style='height: 30%' class='col-sm-6' id='incidentmap'></div>
 							<div id='incidentmap2'></div>
 							<script>
-								var mymap = L.map('incidentmap').setView([0, 0], 2);
-								L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {attribution: 'Tiles &copy; Open Street Map'}).addTo(mymap);
-								mymap.setView(new L.LatLng(".$row["lat"].", ".$row["lang"]."), ".$mapZoom.");
+								var mymap = L.map('incidentmap', {fullscreenControl: {
+									pseudoFullscreen: true
+								}}).setView(new L.LatLng(".$row["lat"].", ".$row["lang"]."), ".$mapZoom.");
+								L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {attribution: 'Tiles &copy; Open Street Map'}).addTo(mymap);
 								var markerGroup = L.layerGroup().addTo(mymap);
 								L.marker([".$row["lat"].", ".$row["lang"]."]).addTo(mymap);
 								mymap.on('contextmenu', function (event) {
@@ -496,9 +499,24 @@ echo "
 										echo "<b style='color:grey'>".$row2["shortName"]."</b>, ";
 										$mapColor = "grey";
 									}
-									echo "<script>L.marker([".$row2["lat"].", ".$row2["lang"]."], {icon: L.icon.pulse({iconSize:[10,10],fillColor:'".$mapColor."',animate:false,color:'".$mapColor."'})}).bindTooltip('".$row2["shortName"]."',{permanent: true}).addTo(markerGroup);</script>";
+									echo "<script>L.marker([".$row2["lat"].", ".$row2["lang"]."], {icon: L.icon.pulse({iconSize:[10,10],fillColor:'".$mapColor."',animate:false,color:'".$mapColor."'})}).bindTooltip('".$row2["shortName"]."',{permanent: true}).addTo(markerGroup);";
 								}
 							}
+							$sql = "SELECT * FROM incidentpoints WHERE Incident = '".$_SESSION["incident"]."'";
+							$result = $conn->query($sql);
+							if ($result->num_rows > 0) {
+								while($row = $result->fetch_assoc()) {
+									echo "L.marker([".$row["lat"].", ".$row["lang"]."], {icon: L.icon({iconUrl: 'resources/IncidentSymbology/".$row["file"].".png',iconSize: [25, 25],iconAnchor: [12.5, 12.5],popupAnchor: [12.5, 12.5],})}).addTo(markerGroup);";
+								}
+							}
+							$sql = "SELECT * FROM universalpoints";
+							$result = $conn->query($sql);
+							if ($result->num_rows > 0) {
+								while($row = $result->fetch_assoc()) {
+									echo "L.marker([".$row["lat"].", ".$row["lang"]."], {icon: L.icon({iconUrl: 'resources/IncidentSymbology/".$row["file"].".png',iconSize: [25, 25],iconAnchor: [12.5, 12.5],popupAnchor: [12.5, 12.5],})}).addTo(mymap);";
+								}
+							}
+							echo "</script>";
 							echo "</span><br><br><a href='#incilog' class='btn btn-info' data-toggle='collapse'>Show Incident Log</a><a href='#comms' class='btn btn-info' data-toggle='collapse'>Show Radio Channels</a><a href='#command' class='btn btn-info' data-toggle='collapse'>Show Command Options</a>
 							<div id='incilog' class='collapse'>
 								<table class='table'>

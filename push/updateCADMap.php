@@ -13,7 +13,7 @@ $sql = "SELECT * FROM units WHERE incidentID = '".$_SESSION["incident"]."'";
 $result = $conn->query($sql);
 if ($result->num_rows > 0) {
 	while($row = $result->fetch_assoc()) {
-		$status = $row2["status"];
+		$status = $row["status"];
 		$mapColor = "";
 		if ($status == "enroute") {
 			$mapColor = "blue";
@@ -22,7 +22,15 @@ if ($result->num_rows > 0) {
 		} else {
 			$mapColor = "grey";
 		}
-		$out .= "L.marker([".$row["lat"].", ".$row["lang"]."], {icon: L.icon.pulse({iconSize:[10,10],fillColor:'".$mapColor."',animate:false,color:'".$mapColor."'})}).bindTooltip('".$row["shortName"]."',{permanent: true}).addTo(markerGroup);";";
+		$out .= "L.marker([".$row["lat"].", ".$row["lang"]."], {icon: L.icon.pulse({iconSize:[10,10],fillColor:'".$mapColor."',animate:false,color:'".$mapColor."'})}).bindTooltip('".$row["shortName"]."',{permanent: true}).addTo(markerGroup);";
+	}
+}
+
+$sql = "SELECT * FROM incidentpoints WHERE Incident = '".$_SESSION["incident"]."'";
+$result = $conn->query($sql);
+if ($result->num_rows > 0) {
+	while($row = $result->fetch_assoc()) {
+		$out .= "L.marker([".$row["lat"].", ".$row["lang"]."], {icon: L.icon({iconUrl: 'resources/IncidentSymbology/".$row["file"].".png',iconSize: [25, 25],iconAnchor: [12.5, 12.5],popupAnchor: [12.5, 12.5],})}).addTo(markerGroup);";
 	}
 }
 
