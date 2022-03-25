@@ -100,18 +100,26 @@ if (empty($_GET)) {
 	if ($conn->connect_error) {
 		die("Connection failed: " . $conn->connect_error);
 	}
- 
-	$sql = "INSERT INTO incidents (address, type, details) VALUES ('".$_GET["address"]."','".$_GET["type"]."','".$_GET["details"]."')";
+	$address = geocode($_GET["address"]);
+	//var_dump($address);
+	$lat = $address->{'results'}[0]->{'location'}->{'lat'};
+	$lang = $address->{'results'}[0]->{'location'}->{'lng'};
+	
+	$sql = "INSERT INTO incidents (address, type, details, lat, lang) VALUES ('".$_GET["address"]."','".$_GET["type"]."','".$_GET["details"]."','".$lat."','".$lang."')";
  
 	if ($conn->query($sql) === TRUE) {
 		$last_id = $conn->insert_id;
-		foreach ($_GET["radio"] as $r) {
-			$sql3 = "UPDATE radiocomms SET IncidentID='".$last_id."' WHERE ID = ".$r;
-			$conn->query($sql3);
+		if (isset($_GET["radio"])) {
+			foreach ($_GET["radio"] as $r) {
+				$sql3 = "UPDATE radiocomms SET IncidentID='".$last_id."' WHERE ID = ".$r;
+				$conn->query($sql3);
+			}
 		}
-		foreach ($_GET["units"] as $u) {
-			$sql3 = "UPDATE units SET incidentID='".$last_id."', status = 'dispatched' WHERE ID = ".$u;
-			$conn->query($sql3);
+		if (isset($_GET["units"])) {
+			foreach ($_GET["units"] as $u) {
+				$sql3 = "UPDATE units SET incidentID='".$last_id."', status = 'dispatched' WHERE ID = ".$u;
+				$conn->query($sql3);
+			}
 		}
 		$sql2 = "UPDATE units SET incidentID = ".$last_id.", status = 'dispatched' WHERE ID = ".$_SESSION["UnitID"];
 		$_SESSION["incident"] = $last_id;
@@ -122,5 +130,57 @@ if (empty($_GET)) {
 	}
 	$conn->close();
 }
-
+function geocode($address) {
+	require("options.php");
+	require("db.php");
+	$og = $address;
+	$response = "";
+	$conn = new mysqli($db_server, $db_user, $db_password, $db_db);
+	$sql2 = "SELECT * FROM localgeocoder WHERE LocationName = '".$address."'";
+	$result2 = $conn->query($sql2);
+	if ($result2->num_rows > 0) {
+		while($row2 = $result2->fetch_assoc()) {
+			$response = "{
+							\"results\": [{
+								\"formatted_address\": \"".$row2["LocationName"]." (".$row2["address"].")\",
+								\"location\": {
+									\"lat\": \"".$row2["lat"]."\",
+									\"lng\": \"".$row2["lang"]."\"
+								}
+							}]
+						}";
+		}
+	} else {
+		if (($response = @file_get_contents('https://api.geocod.io/v1.7/geocode?q='.urlencode($address).'&api_key='.$geocodiokey)) === false) {
+			$address = str_replace(" ","|",$address);
+			$address = str_replace(",","|",$address);
+			$s = explode("|",$address ,2) ;
+			if (count($s) < 2) {
+				$response = "{
+								\"results\": [{
+									\"formatted_address\": \"".$og."\",
+									\"location\": {
+										\"lat\": \"0\",
+										\"lng\": \"0\"
+									}
+								}]
+							}";
+			} else {
+				$s[1]=str_replace("|","",$s[1]);
+				$response = "{
+								\"results\": [{
+									\"formatted_address\": \"".$s[0].", ".$s[1]."\",
+									\"location\": {
+										\"lat\": \"".$s[0]."\",
+										\"lng\": \"".$s[1]."\"
+									}
+								}]
+							}";
+			}
+		}
+	}
+	$response = json_decode($response);
+	$conn->close();
+	return $response;	
+}
 ?>
