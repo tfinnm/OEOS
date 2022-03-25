@@ -462,13 +462,14 @@ echo "
 								L.marker([".$row["lat"].", ".$row["lang"]."]).addTo(mymap);
 								mymap.on('contextmenu', function (event) {
 									console.log('Coordinates: ' + event.latlng.toString());
-									L.marker(event.latlng, {icon: L.icon({
-    iconUrl: 'resources/IncidentSymbology/command-post-plain.png',
-    iconSize: [25, 25],
-    iconAnchor: [12.5, 12.5],
-    popupAnchor: [12.5, 12.5],
-    })}).addTo(mymap);
-								});
+									L.marker(event.latlng, {
+										icon: L.icon({
+											iconUrl: 'resources/IncidentSymbology/IncidentLocations/command-post-plain.png',
+											iconSize: [25, 25],
+											iconAnchor: [12.5, 12.5],
+											popupAnchor: [12.5, 12.5],
+										})}).addTo(mymap);
+									});
 							</script>
 							<div id='callDetails' class='col-sm-6'>
 								<h4><b>Address:</b></h4>
