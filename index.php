@@ -386,6 +386,7 @@ echo "
 						while($row = $result->fetch_assoc()) {
 							$ackbutton = "";
 							$ackval = "";
+							$mapZoom = 12;
 							$sql2 = "SELECT * FROM units WHERE ID = '".$_SESSION["UnitID"]."'";
 							$result2 = $conn->query($sql2);
 							if ($result2->num_rows > 0) {
@@ -394,12 +395,18 @@ echo "
 									if ($status == "dispatched") {
 										$ackbutton = "<button type='submit'>En Route</button>";
 										$ackval = "enroute";
+										$mapZoom = 8;
 									} elseif ($status == "enroute") {
 										$ackbutton = "<button type='submit'>On Scene</button>";
 										$ackval = "scene";
+										$mapZoom = 10;
+									} elseif ($status == "clear") {
+										$ackbutton = "<button type='submit'>Return to Incident</button>";
+										$ackval = "enroute";
 									} else {
 										$ackbutton = "<button type='submit'>Return to Service</button>";
 										$ackval = "clear";
+										$mapZoom = 14;
 									}
 								}
 							}
@@ -443,13 +450,25 @@ echo "
 							<div class='row'>
 							<link rel='stylesheet' href='libraries/leaflet/leaflet.css'/>
 							<script src='libraries/leaflet/leaflet.js'></script>
-							<link rel='stylesheet' href='https://unpkg.com/leaflet-geosearch@3.0.0/dist/geosearch.css'/>
-							<script src='https://unpkg.com/leaflet-geosearch@3.0.0/dist/geosearch.umd.js'></script>
+							<link rel='stylesheet' href='libraries\leaflet-pulsingicon/L.Icon.Pulse.min.css'/>
+							<script src='libraries\leaflet-pulsingicon/L.Icon.Pulse.min.js'></script>
 							<div style='height: 30%' class='col-sm-6' id='incidentmap'></div>
+							<div id='incidentmap2'></div>
 							<script>
 								var mymap = L.map('incidentmap').setView([0, 0], 2);
-								L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {attribution: 'Tiles &copy; Esri'}).addTo(mymap);
-								
+								L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {attribution: 'Tiles &copy; Open Street Map'}).addTo(mymap);
+								mymap.setView(new L.LatLng(".$row["lat"].", ".$row["lang"]."), ".$mapZoom.");
+								var markerGroup = L.layerGroup().addTo(mymap);
+								L.marker([".$row["lat"].", ".$row["lang"]."]).addTo(mymap);
+								mymap.on('contextmenu', function (event) {
+									console.log('Coordinates: ' + event.latlng.toString());
+									L.marker(event.latlng, {icon: L.icon({
+    iconUrl: 'resources/IncidentSymbology/command-post-plain.png',
+    iconSize: [25, 25],
+    iconAnchor: [12.5, 12.5],
+    popupAnchor: [12.5, 12.5],
+    })}).addTo(mymap);
+								});
 							</script>
 							<div id='callDetails' class='col-sm-6'>
 								<h4><b>Address:</b></h4>
@@ -460,18 +479,23 @@ echo "
 							</div>
 							<h4><b>Assigned Units:</b></h4>	<span id='callUnits'>
 							";
-							$sql2 = "SELECT * FROM units WHERE incidentID = '".$_SESSION["incident"]."'";
+							$sql2 = "SELECT * FROM units WHERE display = '1' AND incidentID = '".$_SESSION["incident"]."'";
 							$result2 = $conn->query($sql2);
 							if ($result2->num_rows > 0) {
 								while($row2 = $result2->fetch_assoc()) {
 									$status = $row2["status"];
+									$mapColor = "";
 									if ($status == "enroute") {
 										echo "<b style='color:blue'>".$row2["shortName"]."</b>, ";
+										$mapColor = "blue";
 									} elseif ($status == "scene") {
 										echo "<b style='color:green'>".$row2["shortName"]."</b>, ";
+										$mapColor = "green";
 									} else {
 										echo "<b style='color:grey'>".$row2["shortName"]."</b>, ";
+										$mapColor = "grey";
 									}
+									echo "<script>L.marker([".$row2["lat"].", ".$row2["lang"]."], {icon: L.icon.pulse({iconSize:[10,10],fillColor:'".$mapColor."',animate:false,color:'".$mapColor."'})}).bindTooltip('".$row2["shortName"]."',{permanent: true}).addTo(markerGroup);</script>";
 								}
 							}
 							echo "</span><br><br><a href='#incilog' class='btn btn-info' data-toggle='collapse'>Show Incident Log</a><a href='#comms' class='btn btn-info' data-toggle='collapse'>Show Radio Channels</a><a href='#command' class='btn btn-info' data-toggle='collapse'>Show Command Options</a>
@@ -685,6 +709,13 @@ if(typeof(EventSource) !== "undefined") {
 		} else {
 			document.getElementById('callDetails').innerHTML = event.data;
 		}
+	};
+}
+if(typeof(EventSource) !== "undefined") {
+	var sourcemap = new EventSource("push/updateCADMap.php");
+	sourcemap.onmessage = function(event) {
+		markerGroup.clearLayers();
+		eval(event.data);
 	};
 }
 </script>

@@ -14,6 +14,8 @@
 		<p>Administrator Name: ".$adminname."</p>
 		<p>Administrator Email: ".$adminemail."</p>
 		<p>Administrator Phone: ".$adminphone."</p>
+		<p>Enforce HTTPS Use: ".($enforceHTTPS ? 'On' : 'Off')."</p>
+		<p>Geocod.io API Key: ".(($geocodiokey!="") ? '********' : 'N/A')."</p>
 		<br>
 		<h4>Read Only Settings: (Configured in db.php)</h4>
 		<p>SQL Server: ".$db_server."</p>

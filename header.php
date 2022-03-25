@@ -22,6 +22,36 @@ function bootlibs() {
 		<link rel=\"stylesheet\" href=\"libraries/dialogs/css/bootstrap-dialog.min.css\">
 	";
 	}
+	include("options.php");
+	if ($enforceHTTPS) {
+		if (!checkSecure()) {
+			$redirect = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+			header('HTTP/1.1 301 Moved Permanently');
+			header('Location: ' . $redirect);
+			die();
+		} else {
+			echo "
+				<script>
+					if ('https:' != document.location.protocol) {
+						window.location.href = window.location.href.replace('http:', 'https:');
+					}
+				</script>
+			";
+		}
+	}
+}
+function checkSecure() {
+	$isSecure = false;
+	if (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443) {
+		$isSecure = true;
+	} elseif (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != 'off' && $_SERVER['HTTPS'] != "") {
+		$isSecure = true;
+	} elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on') {
+		$isSecure = true;
+	} elseif (isset($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] === 'https') {
+		$isSecure = true;
+	}
+	return $isSecure;
 }
 function topbar($admin = false) {
 	session_start();
@@ -171,6 +201,18 @@ function topbar($admin = false) {
 					}
 				};
 			}
+			options = {
+				enableHighAccuracy: true,
+				timeout: 5000,
+				maximumAge: 0
+			};
+			navigator.geolocation.watchPosition((position) => {
+				var ajax = new XMLHttpRequest();
+				ajax.open('POST', 'sendloc.php');
+				ajax.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+				ajax.send('lat='+position.coords.latitude+'&long='+position.coords.longitude);
+			}, (error) => {}, options);
+			
 		</script>";
 	
 	//echo $_SERVER['REQUEST_URI'];
