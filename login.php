@@ -12,7 +12,7 @@
 	<div class="container">
 		<center>
 			<?php
-			include_once("options.php");
+			include("options.php");
 			
 			echo "<h1><abbr title='Open Emergency Operations Suite'><b style='color:white;'>O</b><b style='color:red;'>EO</b><b style='color:white;'>S</b></abbr><br><small>".$name."</small></h1>
 			<br/>";

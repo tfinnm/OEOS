@@ -7,16 +7,17 @@ $conn = new mysqli($db_server, $db_user, $db_password, $db_db);
 if (isset ($_GET["unit"])) {
 	$incident = -1;
 	foreach ($_GET["unit"] as $unit) {
-		if (!isset($_SESSION["stationincident"]["".$unit])) {
-			$_SESSION["stationincident"]["".$unit] = -1;
-		}
 		$sql = "SELECT incidentID FROM units WHERE ID = '".$unit."'";
 		$result = $conn->query($sql);
 		if ($result->num_rows > 0) {
 			while($row = $result->fetch_assoc()) {
-				if ($row["incidentID"] != $_SESSION["stationincident"]["".$unit]) {
+				if (isset($_SESSION["stationincident"]["".$unit])) {
+					if ($row["incidentID"] != $_SESSION["stationincident"]["".$unit]) {
+						$_SESSION["stationincident"]["".$unit] = $row["incidentID"];
+						$incident = $row["incidentID"];
+					}
+				} else {
 					$_SESSION["stationincident"]["".$unit] = $row["incidentID"];
-					$incident = $row["incidentID"];
 				}
 			}
 		}
@@ -43,15 +44,15 @@ if (isset ($_GET["unit"])) {
 				}
 			}
 		}
-		$sql = "SELECT * FROM radiocomms where IncidentID = ".$_SESSION["incident"];
+		$sql = "SELECT * FROM radiocomms where IncidentID = ".$incident;
 		$result = $conn->query($sql);
 		if ($result->num_rows > 0) {
 			while($row = $result->fetch_assoc()) {
-				$incidentChannel .= $row3["pronunciation"].". ";
+				$incidentChannel .= $row["pronunciation"].". ";
 			}
 		}
 		$text= $incidentUnits.$incidentType.". ".$incidentChannel.$incidentUnits.$incidentType.". ".$incidentChannel." Time out ".$incidentTime;
-		if ($_SESSION["pushHash"]["StationBoardLatest"] == null or $_SESSION["pushHash"]["StationBoardLatest"] != crc32($text)) {
+		if (!isset($_SESSION["pushHash"]["StationBoardLatest"]) or $_SESSION["pushHash"]["StationBoardLatest"] == null or $_SESSION["pushHash"]["StationBoardLatest"] != crc32($text)) {
 			$_SESSION["pushHash"]["StationBoardLatest"] = crc32($text);
 			echo "data: ".$text."\n\n";
 			flush();		
