@@ -395,11 +395,11 @@ echo "
 									if ($status == "dispatched") {
 										$ackbutton = "<button type='submit'>En Route</button>";
 										$ackval = "enroute";
-										$mapZoom = 8;
+										$mapZoom = 10;
 									} elseif ($status == "enroute") {
 										$ackbutton = "<button type='submit'>On Scene</button>";
 										$ackval = "scene";
-										$mapZoom = 10;
+										$mapZoom = 12;
 									} elseif ($status == "clear") {
 										$ackbutton = "<button type='submit'>Return to Incident</button>";
 										$ackval = "enroute";
@@ -423,6 +423,39 @@ echo "
 								}
 							} else {
 								$command = "N/A";
+							}
+							include("resources/IncidentSymbology/incidentSymbology.php");
+							$locSym = "";
+							foreach ($incidentSymbology["loc"] as $loc) {
+								$locSym .= "'<label><input type=\"radio\" name=\"icon\" value=\"".$loc."\"><img style=\"width:75\" src=\"resources/IncidentSymbology/".$loc."\" /></label>'+";
+							}
+							$assignSym = "";
+							foreach ($incidentSymbology["assign"] as $loc) {
+								$assignSym .= "'<label><input type=\"radio\" name=\"icon\" value=\"".$loc."\"><img style=\"width:75\" src=\"resources/IncidentSymbology/".$loc."\" /></label>'+";
+							}
+							$usarSym = "";
+							foreach ($incidentSymbology["usar"] as $loc) {
+								$usarSym .= "'<label><input type=\"radio\" name=\"icon\" value=\"".$loc."\"><img style=\"width:75\" src=\"resources/IncidentSymbology/".$loc."\" /></label>'+";
+							}
+							$waterSym = "";
+							foreach ($incidentSymbology["water"] as $loc) {
+								$waterSym .= "'<label><input type=\"radio\" name=\"icon\" value=\"".$loc."\"><img style=\"width:75\" src=\"resources/IncidentSymbology/".$loc."\" /></label>'+";
+							}
+							$hazardIcons = "";
+							foreach ($incidentSymbology["hazards"] as $loc) {
+								$hazardIcons .= "'<option value=\"".$loc[1]."\">".$loc[0]."</option>'+";
+							}
+							$iedrows = "";
+							foreach ($incidentSymbology["ied"] as $loc) {
+								$iedrows .= "'<tr><td>".$loc[0]."</td><td>".$loc[1]."</td><td><button type=\"button\" class=\"btn btn-default\" onclick=\"setHazardMarkerOptions(".$loc[3].",".$loc[4].",0,0,\'IED - ".$loc[0]."\',\'".$loc[2]."\')\">Select</button></td></tr>'+";
+							}
+							$bleverows = "";
+							foreach ($incidentSymbology["bleve"] as $loc) {
+								$bleverows .= "'<tr><td>".$loc[0]."</td><td>".$loc[1]."</td><td>".$loc[2]."</td><td><button type=\"button\" class=\"btn btn-default\" onclick=\"setHazardMarkerOptions(".$loc[4].",".$loc[5].",0,".$loc[6].",\'BLEVE - ".$loc[0]."\',\'".$loc[3]."\')\">Select</button></td></tr>'+";
+							}
+							$wmdrows = "";
+							foreach ($incidentSymbology["wmd"] as $loc) {
+								$wmdrows .= "'<tr><td>".$loc[0]."</td><td><button type=\"button\" class=\"btn btn-default\" onclick=\"setHazardMarkerOptions(".$loc[2].",".$loc[3].",".$loc[4].",".$loc[5].",\'WMD - ".$loc[0]."\',\'".$loc[1]."\')\">Select</button></td></tr>'+";
 							}
 							echo "
 							<form action='' method='post'><input type='text' name='statusChange' value='".$ackval."' hidden></input>
@@ -454,25 +487,198 @@ echo "
 							<script src='libraries\leaflet-pulsingicon/L.Icon.Pulse.min.js'></script>
 							<script src='libraries\leaflet-fullscreen\Leaflet.fullscreen.min.js'></script>
 							<link href='libraries\leaflet-fullscreen\leaflet.fullscreen.css' rel='stylesheet' />
+							<script src='libraries\leaflet-contextmenu\leaflet.contextmenu.min.js'></script>
+							<link href='libraries\leaflet-contextmenu\leaflet.contextmenu.min.css' rel='stylesheet' />
+							<script src='libraries\leaflet-semicircle\Semicircle.js'></script>
 							<div style='height: 30%' class='col-sm-6' id='incidentmap'></div>
 							<div id='incidentmap2'></div>
 							<script>
-								var mymap = L.map('incidentmap', {fullscreenControl: {
-									pseudoFullscreen: true
-								}}).setView(new L.LatLng(".$row["lat"].", ".$row["lang"]."), ".$mapZoom.");
+								var mymap = L.map('incidentmap', {
+									fullscreenControl: {
+										pseudoFullscreen: true
+									},
+									contextmenu: true,
+									contextmenuItems: [
+									{
+										text: 'New Point',
+										callback: placePoint
+									}, {
+										text: 'Mark Hazard',
+										callback: placeHazMat
+									}, 
+									'-',
+									{
+										text: 'Center map here',
+										callback: centerMap
+									}, 
+									'-',
+									{
+										text: 'Zoom in',
+										icon: 'libraries/leaflet-contextmenu/images/zoom-in.png',
+										callback: zoomIn
+									}, {
+										text: 'Zoom out',
+										icon: 'libraries/leaflet-contextmenu/images/zoom-out.png',
+										callback: zoomOut
+									}],
+								}).setView(new L.LatLng(".$row["lat"].", ".$row["lang"]."), ".$mapZoom.");
+								L.control.scale().addTo(mymap);
 								L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {attribution: 'Tiles &copy; Open Street Map'}).addTo(mymap);
 								var markerGroup = L.layerGroup().addTo(mymap);
 								L.marker([".$row["lat"].", ".$row["lang"]."]).addTo(mymap);
-								mymap.on('contextmenu', function (event) {
-									console.log('Coordinates: ' + event.latlng.toString());
-									L.marker(event.latlng, {
-										icon: L.icon({
-											iconUrl: 'resources/IncidentSymbology/IncidentLocations/command-post-plain.png',
-											iconSize: [25, 25],
-											iconAnchor: [12.5, 12.5],
-											popupAnchor: [12.5, 12.5],
-										})}).addTo(mymap);
-									});
+
+								function centerMap (e) {
+									mymap.panTo(e.latlng);
+								}
+
+								function zoomIn (e) {
+									mymap.zoomIn();
+								}
+
+								function zoomOut (e) {
+									mymap.zoomOut();
+								}
+								
+								function placePoint(e) {
+									if (!mymap.isFullscreen()) {
+										BootstrapDialog.show({
+								 			type: BootstrapDialog.TYPE_PRIMARY,
+								 			title: 'Place Marker',
+								 			message: '<form id=\"iconSelect\"><ul class=\"nav nav-tabs\"><li class=\"active\"><a data-toggle=\"tab\" href=\"#ics1\">ICS Locations</a></li><li><a data-toggle=\"tab\" href=\"#ics2\">ICS Assignments</a></li><li><a data-toggle=\"tab\" href=\"#usar\">USAR</a></li><li><a data-toggle=\"tab\" href=\"#water\">Water Supply</a></li></ul>'+
+								 					'<div class=\"tab-content\"><div id=\"ics1\" class=\"tab-pane fade in active\">'+
+								 					".$locSym."
+								 					'</div><div id=\"ics2\" class=\"tab-pane fade\">'+
+								 					".$assignSym."
+								 					'</div><div id=\"usar\" class=\"tab-pane fade\">'+
+								 					".$usarSym."
+								 					'</div><div id=\"water\" class=\"tab-pane fade\">'+
+								 					".$waterSym."
+								 					'</div></div><hr><center>'+
+													'<label class=\'radio-inline\'><input type=\'radio\' name=\'iconSize\' value=\'25\' required>Small</label>'+
+													'<label class=\'radio-inline\'><input type=\'radio\' name=\'iconSize\' value=\'37.5\' checked required>Medium</label>'+
+													'<label class=\'radio-inline\'><input type=\'radio\' name=\'iconSize\' value=\'50\' required>Large Icon</label>'+
+													'</center></form>',
+								 			buttons: [{
+								 				label: 'Place',
+								 				action: function(dialogItself){
+								 					if (document.forms.iconSelect.icon.value != \"\") {
+								 						L.marker(e.latlng, {
+															contextmenu: true,
+																contextmenuItems: [{
+																	text: 'Remove Point',
+																	index: 0
+																}, {
+																	separator: true,
+																	index: 1
+																}],
+								 							icon: L.icon({
+								 								iconUrl: 'resources/IncidentSymbology/'+document.forms.iconSelect.icon.value,
+								 								iconSize: [document.forms.iconSelect.iconSize.value, document.forms.iconSelect.iconSize.value],
+								 								iconAnchor: [document.forms.iconSelect.iconSize.value/2, document.forms.iconSelect.iconSize.value/2],
+								 								popupAnchor: [document.forms.iconSelect.iconSize.value/2, document.forms.iconSelect.iconSize.value/2],
+								 							})
+								 						}).addTo(mymap);
+								 					}
+								 					dialogItself.close();
+								 				}
+								 			}]
+								 		});
+								 	}
+								}
+								function setHazardMarkerOptions(distance1,distance2,distance3,distance4,name,icon) {
+									document.getElementById('multi1').innerHTML = 'ft';
+									document.getElementById('multiplier1').setAttribute('value', '0.305');
+									document.getElementById('multi2').innerHTML = 'ft';
+									document.getElementById('multiplier2').setAttribute('value', '0.305');
+									document.getElementById('multi3').innerHTML = 'ft';
+									document.getElementById('multiplier3').setAttribute('value', '0.305');
+									document.getElementById('multi4').innerHTML = 'ft';
+									document.getElementById('multiplier4').setAttribute('value', '0.305');
+									document.getElementById('dist1').setAttribute('value', distance1);
+									document.getElementById('dist2').setAttribute('value', distance2);
+									document.getElementById('dist3').setAttribute('value', distance3);
+									document.getElementById('dist4').setAttribute('value', distance4);
+									document.getElementById('hazardIcon').add(new Option(name,icon));
+									document.getElementById('hazardIcon').value = icon;
+								}
+								function placeHazMat(e) {
+									if (!mymap.isFullscreen()) {
+										BootstrapDialog.show({
+								 			type: BootstrapDialog.TYPE_PRIMARY,
+								 			title: 'Place Hazard Marker',
+								 			message: '<form id=\"hazardSelect\"><ul class=\"nav nav-tabs\"><li class=\"active\"><a data-toggle=\"tab\" href=\"#erg\">HazMat</a></li><li><a data-toggle=\"tab\" href=\"#bleve\">BLEVE</a></li><li><a data-toggle=\"tab\" href=\"#ied\">IED</a></li><li><a data-toggle=\"tab\" href=\"#wmd\">WMD</a></li><li><a data-toggle=\"tab\" href=\"#man\">Manual Entry</a></li><li><a data-toggle=\"tab\" href=\"#other\">Other</a></li></ul>'+
+								 					'<div class=\"tab-content\"><div id=\"erg\" class=\"tab-pane fade in active\">'+
+								 					'</div><div id=\"bleve\" class=\"tab-pane fade\">'+
+														'<table class=\'table table-striped table-hover table-condensed\'><thead><tr><th>Capacity</th><th>Diameter</th><th>Length</th><th>Select</th></tr></thead><tbody>'+
+														".$bleverows."
+														'</tbody></table>'+
+								 					'</div><div id=\"ied\" class=\"tab-pane fade\">'+
+														'<table class=\'table table-striped table-hover table-condensed\'><thead><tr><th>Name</th><th>TNT Equiv./LPG Volume</th><th>Select</th></tr></thead><tbody>'+
+														".$iedrows."
+														'</tbody></table>'+
+								 					'</div><div id=\"wmd\" class=\"tab-pane fade\">'+
+														'<table class=\'table table-striped table-hover table-condensed\'><thead><tr><th>Name</th><th>Select</th></tr></thead><tbody>'+
+														".$wmdrows."
+														'</tbody></table>'+
+								 					'</div><div id=\"man\" class=\"tab-pane fade\"><br>'+
+														'<div class=\"row\"><div class=\"col-sm-4\"><label for=\"icon\">Hazard: </label></div><div class=\"col-sm-8\"><select class=\"form-control\" id=\"hazardIcon\" name=\"icon\" required>'+
+															'<option value=\"incidentType/other-hazard.png\" selected>Unknown/Other Hazard</option>'+
+															".$hazardIcons."
+														'</select></div></div><br>'+
+														'<div class=\"row\"><div class=\"col-sm-6\"><label for=\"dist1\">Primary Distance:</label></div><div class=\"col-sm-6\"><div style=\"width:100%;\" class=\"input-group\"><input class=\"form-control\" type=\"text\" name=\"dist1\" id=\"dist1\" required></input><div class=\"input-group-btn\"><button type=\"button\" data-toggle=\"dropdown\" id=\"multi1\" class=\"btn btn-default dropdown-toggle\">ft</button>'+
+														'<ul class=\"dropdown-menu\"><li><a href=\"javascript:void(\'0\');\" onclick=\"document.getElementById(\'multi1\').innerHTML = \'ft\';document.getElementById(\'multiplier1\').setAttribute(\'value\', \'0.305\');\">Feet</a></li><li><a href=\"javascript:void(\'0\');\" onclick=\"document.getElementById(\'multi1\').innerHTML = \'mi\';document.getElementById(\'multiplier1\').setAttribute(\'value\', \'1609.34\');\">Miles</a></li><li><a href=\"javascript:void(\'0\');\" onclick=\"document.getElementById(\'multi1\').innerHTML = \'m\';document.getElementById(\'multiplier1\').setAttribute(\'value\', \'1\');\">Meters</a></li></ul></div></div></div></div><br>'+
+														'<div class=\"row\"><div class=\"col-sm-6\"><label for=\"dist2\">Secondary Distance:</label></div><div class=\"col-sm-6\"><div style=\"width:100%;\" class=\"input-group\"><input class=\"form-control\" type=\"text\" name=\"dist2\" id=\"dist2\" required></input><div class=\"input-group-btn\"><button type=\"button\" data-toggle=\"dropdown\" id=\"multi2\" class=\"btn btn-default dropdown-toggle\">ft</button>'+
+														'<ul class=\"dropdown-menu\"><li><a href=\"javascript:void(\'0\');\" onclick=\"document.getElementById(\'multi2\').innerHTML = \'ft\';document.getElementById(\'multiplier2\').setAttribute(\'value\', \'0.305\');\">Feet</a></li><li><a href=\"javascript:void(\'0\');\" onclick=\"document.getElementById(\'multi2\').innerHTML = \'mi\';document.getElementById(\'multiplier2\').setAttribute(\'value\', \'1609.34\');\">Miles</a></li><li><a href=\"javascript:void(\'0\');\" onclick=\"document.getElementById(\'multi2\').innerHTML = \'m\';document.getElementById(\'multiplier2\').setAttribute(\'value\', \'1\');\">Meters</a></li></ul></div></div></div></div><br>'+
+														'<div class=\"row\"><div class=\"col-sm-6\"><label for=\"dist4\">Response Distance:</label></div><div class=\"col-sm-6\"><div style=\"width:100%;\" class=\"input-group\"><input class=\"form-control\" type=\"text\" name=\"dist4\" id=\"dist4\" required></input><div class=\"input-group-btn\"><button type=\"button\" data-toggle=\"dropdown\" id=\"multi4\" class=\"btn btn-default dropdown-toggle\">ft</button>'+
+														'<ul class=\"dropdown-menu\"><li><a href=\"javascript:void(\'0\');\" onclick=\"document.getElementById(\'multi4\').innerHTML = \'ft\';document.getElementById(\'multiplier4\').setAttribute(\'value\', \'0.305\');\">Feet</a></li><li><a href=\"javascript:void(\'0\');\" onclick=\"document.getElementById(\'multi4\').innerHTML = \'mi\';document.getElementById(\'multiplier4\').setAttribute(\'value\', \'1609.34\');\">Miles</a></li><li><a href=\"javascript:void(\'0\');\" onclick=\"document.getElementById(\'multi4\').innerHTML = \'m\';document.getElementById(\'multiplier4\').setAttribute(\'value\', \'1\');\">Meters</a></li></ul></div></div></div></div><br>'+
+														'<div class=\"row\"><div class=\"col-sm-6\"><label for=\"dist3\">Downwind Distance:</label></div><div class=\"col-sm-6\"><div style=\"width:100%;\" class=\"input-group\"><input class=\"form-control\" type=\"text\" name=\"dist3\" id=\"dist3\" required></input><div class=\"input-group-btn\"><button type=\"button\" data-toggle=\"dropdown\" id=\"multi3\" class=\"btn btn-default dropdown-toggle\">ft</button>'+
+														'<ul class=\"dropdown-menu\"><li><a href=\"javascript:void(\'0\');\" onclick=\"document.getElementById(\'multi3\').innerHTML = \'ft\';document.getElementById(\'multiplier3\').setAttribute(\'value\', \'0.305\');\">Feet</a></li><li><a href=\"javascript:void(\'0\');\" onclick=\"document.getElementById(\'multi3\').innerHTML = \'mi\';document.getElementById(\'multiplier3\').setAttribute(\'value\', \'1609.34\');\">Miles</a></li><li><a href=\"javascript:void(\'0\');\" onclick=\"document.getElementById(\'multi3\').innerHTML = \'m\';document.getElementById(\'multiplier3\').setAttribute(\'value\', \'1\');\">Meters</a></li></ul></div></div></div></div><br>'+
+													'</div><div id=\"other\" class=\"tab-pane fade\">'+
+								 					'</div></div><input hidden value=\'0.305\' id=\'multiplier1\' name=\'multiplier1\'></input><input hidden value=\'0.305\' id=\'multiplier2\' name=\'multiplier2\'></input><input hidden value=\'0.305\' id=\'multiplier3\' name=\'multiplier3\'></input><input hidden value=\'0.305\' id=\'multiplier4\' name=\'multiplier4\'></input></form>',
+								 			buttons: [{
+								 				label: 'Place',
+								 				action: function(dialogItself){
+													if (document.forms.hazardSelect.icon.value != \"\") {
+								 						L.marker(e.latlng, {
+															contextmenu: true,
+																contextmenuItems: [{
+																	text: 'Remove Point',
+																	index: 0
+																}, {
+																	separator: true,
+																	index: 1
+																}],
+								 							icon: L.icon({
+								 								iconUrl: 'resources/IncidentSymbology/hazard/'+document.forms.hazardSelect.icon.value,
+								 								iconSize: [50, 50],
+								 								iconAnchor: [25, 25],
+								 								popupAnchor: [25, 25],
+								 							})
+								 						}).addTo(mymap);
+														L.circle(e.latlng, {
+															radius: (document.forms.hazardSelect.dist1.value*document.forms.hazardSelect.multiplier1.value),
+															color: 'red',
+														}).addTo(mymap);
+														L.circle(e.latlng, {
+															radius: (document.forms.hazardSelect.dist2.value*document.forms.hazardSelect.multiplier2.value),
+															color: 'yellow',
+														}).addTo(mymap);
+														L.circle(e.latlng, {
+															radius: (document.forms.hazardSelect.dist4.value*document.forms.hazardSelect.multiplier4.value),
+															color: 'green',
+														}).addTo(mymap);
+														L.semiCircle(e.latlng, {
+															radius: (document.forms.hazardSelect.dist3.value*document.forms.hazardSelect.multiplier3.value),
+															color: 'orange',
+														}).setDirection(90, 45)
+														.addTo(mymap);
+								 					}
+								 					dialogItself.close();
+								 				}
+								 			}]
+								 		});
+								 	}
+								}
 							</script>
 							<div id='callDetails' class='col-sm-6'>
 								<h4><b>Address:</b></h4>
@@ -499,14 +705,26 @@ echo "
 										echo "<b style='color:grey'>".$row2["shortName"]."</b>, ";
 										$mapColor = "grey";
 									}
-									echo "<script>L.marker([".$row2["lat"].", ".$row2["lang"]."], {icon: L.icon.pulse({iconSize:[10,10],fillColor:'".$mapColor."',animate:false,color:'".$mapColor."'})}).bindTooltip('".$row2["shortName"]."',{permanent: true}).addTo(markerGroup);";
+									echo "<script>L.marker([".$row2["lat"].", ".$row2["lang"]."], {icon: L.icon.pulse({iconSize:[10,10],fillColor:'".$mapColor."',animate:false,color:'".$mapColor."'})}).bindTooltip('".$row2["shortName"]."',{permanent: true}).addTo(markerGroup);</script>";
 								}
 							}
+							echo "<script>";
 							$sql = "SELECT * FROM incidentpoints WHERE Incident = '".$_SESSION["incident"]."'";
 							$result = $conn->query($sql);
 							if ($result->num_rows > 0) {
 								while($row = $result->fetch_assoc()) {
-									echo "L.marker([".$row["lat"].", ".$row["lang"]."], {icon: L.icon({iconUrl: 'resources/IncidentSymbology/".$row["file"].".png',iconSize: [25, 25],iconAnchor: [12.5, 12.5],popupAnchor: [12.5, 12.5],})}).addTo(markerGroup);";
+									echo "L.marker([".$row["lat"].", ".$row["lang"]."], {
+												contextmenu: true,
+												contextmenuItems: [{
+													text: 'Remove Point',
+													callback: remove,
+													index: 0
+												}, {
+													separator: true,
+													index: 1
+												}],
+												icon: L.icon({
+													iconUrl: 'resources/IncidentSymbology/".$row["file"].".png',iconSize: [25, 25],iconAnchor: [12.5, 12.5],popupAnchor: [12.5, 12.5],})}).addTo(markerGroup);";
 								}
 							}
 							$sql = "SELECT * FROM universalpoints";

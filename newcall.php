@@ -92,7 +92,8 @@ if (empty($_GET)) {
 	</form>
 	";
 } else {
-	
+	include("header.php");
+	polyfill();
 	// Create connection
 	session_start();
 	$conn = new mysqli($db_server, $db_user, $db_password, $db_db);
@@ -104,6 +105,7 @@ if (empty($_GET)) {
 	//var_dump($address);
 	$lat = $address->{'results'}[0]->{'location'}->{'lat'};
 	$lang = $address->{'results'}[0]->{'location'}->{'lng'};
+	$addr = $address->{'results'}[0]->{'formatted_address'};
 	
 	$sql = "INSERT INTO incidents (address, type, details, lat, lang) VALUES ('".$_GET["address"]."','".$_GET["type"]."','".$_GET["details"]."','".$lat."','".$lang."')";
  
@@ -151,7 +153,19 @@ function geocode($address) {
 						}";
 		}
 	} else {
-		if (($response = @file_get_contents('https://api.geocod.io/v1.7/geocode?q='.urlencode($address).'&api_key='.$geocodiokey)) === false) {
+		$w3wRegex = '/^(\/\/\/)?[^\/].{0,}\..{1,}\..{1,}$/i';
+		if ((preg_match($w3wRegex, $address) > 0) && (($response = @file_get_contents('https://api.what3words.com/v3/convert-to-coordinates?key='.$w3wkey.'&words='.urlencode($address).'&format=json')))) {
+			$response2 = json_decode($response);
+			$response = "{
+								\"results\": [{
+									\"formatted_address\": \"".$og."\",
+									\"location\": {
+										\"lat\": \"".$response2->{'coordinates'}->{'lat'}."\",
+										\"lng\": \"".$response2->{'coordinates'}->{'lng'}."\"
+									}
+								}]
+							}";
+		} elseif (($response = @file_get_contents('https://api.geocod.io/v1.7/geocode?q='.urlencode($address).'&api_key='.$geocodiokey)) === false) {
 			$address = str_replace(" ","|",$address);
 			$address = str_replace(",","|",$address);
 			$s = explode("|",$address ,2) ;

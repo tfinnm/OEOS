@@ -15,7 +15,10 @@
 		<p>Administrator Email: ".$adminemail."</p>
 		<p>Administrator Phone: ".$adminphone."</p>
 		<p>Enforce HTTPS Use: ".($enforceHTTPS ? 'On' : 'Off')."</p>
+		<p>Wake Lock: ".($useWakeLock ? 'On' : 'Off')."</p>
 		<p>Geocod.io API Key: ".(($geocodiokey!="") ? '********' : 'N/A')."</p>
+		<p>What3Words API Key: ".(($w3wkey!="") ? '********' : 'N/A')."</p>
+		<p>Default Incident Icon: <img style='height:20' src='resources/IncidentSymbology/incidentType/".$defaultIncidentIcon."'></p>
 		<br>
 		<h4>Read Only Settings: (Configured in db.php)</h4>
 		<p>SQL Server: ".$db_server."</p>

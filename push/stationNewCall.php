@@ -25,6 +25,7 @@ if (isset ($_GET["unit"])) {
 	if ($incident > -1) {
 		$incidentType = "";
 		$incidentUnits = "";
+		$incidentAddr = "";
 		$incidentChannel = "";
 		$incidentTime = "";
 		$sql = "SELECT * FROM incidents where ID = ".$incident;
@@ -33,6 +34,7 @@ if (isset ($_GET["unit"])) {
 			while($row = $result->fetch_assoc()) {
 				$incidentType = $row["type"];
 				$incidentTime = substr(explode(" ",$row["timeOut"])[1],0,5);
+				$incidentAddr = $row["address"];
 			}
 		}
 		$sql = "SELECT * FROM units WHERE incidentID = '".$incident."'";
@@ -51,7 +53,7 @@ if (isset ($_GET["unit"])) {
 				$incidentChannel .= $row["pronunciation"].". ";
 			}
 		}
-		$text= $incidentUnits.$incidentType.". ".$incidentChannel.$incidentUnits.$incidentType.". ".$incidentChannel." Time out ".$incidentTime;
+		$text= $incidentUnits.$incidentType.". ".$incidentAddr.". ".$incidentChannel.$incidentUnits.$incidentType.". ".$incidentAddr.". ".$incidentChannel." Time out ".$incidentTime;
 		if (!isset($_SESSION["pushHash"]["StationBoardLatest"]) or $_SESSION["pushHash"]["StationBoardLatest"] == null or $_SESSION["pushHash"]["StationBoardLatest"] != crc32($text)) {
 			$_SESSION["pushHash"]["StationBoardLatest"] = crc32($text);
 			echo "data: ".$text."\n\n";

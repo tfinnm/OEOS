@@ -39,6 +39,24 @@ function bootlibs() {
 			";
 		}
 	}
+	if ($useWakeLock) {
+		echo "
+			<script>
+				if ('wakeLock' in navigator) {
+					let wakeLock = null;
+					const requestWakeLock = async () => {
+						  wakeLock = await navigator.wakeLock.request('screen');
+					}
+					requestWakeLock();
+					document.addEventListener('visibilitychange', () => {
+						if (wakeLock !== null && document.visibilityState === 'visible') {
+							requestWakeLock();
+						}
+					});
+				}
+			</script>
+		";
+	}
 }
 function checkSecure() {
 	$isSecure = false;
@@ -216,5 +234,23 @@ function topbar($admin = false) {
 		</script>";
 	
 	//echo $_SERVER['REQUEST_URI'];
+}
+
+function polyfill() {
+	if (!function_exists('str_starts_with')) {
+		function str_starts_with($haystack, $needle) {
+			return (string)$needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0;
+		}
+	}
+	if (!function_exists('str_ends_with')) {
+		function str_ends_with($haystack, $needle) {
+			return $needle !== '' && substr($haystack, -strlen($needle)) === (string)$needle;
+		}
+	}
+	if (!function_exists('str_contains')) {
+		function str_contains($haystack, $needle) {
+			return $needle !== '' && mb_strpos($haystack, $needle) !== false;
+		}
+	}
 }
 ?>
