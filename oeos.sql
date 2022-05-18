@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jan 14, 2022 at 11:53 AM
+-- Generation Time: May 18, 2022 at 11:17 AM
 -- Server version: 5.7.31
 -- PHP Version: 7.3.21
 
@@ -20,8 +20,34 @@ SET time_zone = "+00:00";
 --
 -- Database: `oeos`
 --
-CREATE DATABASE IF NOT EXISTS `oeos` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-USE `oeos`;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `assignments`
+--
+
+DROP TABLE IF EXISTS `assignments`;
+CREATE TABLE IF NOT EXISTS `assignments` (
+  `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Name` text NOT NULL,
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `boxalarms`
+--
+
+DROP TABLE IF EXISTS `boxalarms`;
+CREATE TABLE IF NOT EXISTS `boxalarms` (
+  `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `box` text NOT NULL,
+  `unit` text NOT NULL,
+  `forced` tinyint(1) NOT NULL,
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -57,18 +83,58 @@ CREATE TABLE IF NOT EXISTS `events` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `icsforms`
+-- Table structure for table `hospitals`
 --
 
-DROP TABLE IF EXISTS `icsforms`;
-CREATE TABLE IF NOT EXISTS `icsforms` (
+DROP TABLE IF EXISTS `hospitals`;
+CREATE TABLE IF NOT EXISTS `hospitals` (
   `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `formcode` text NOT NULL,
-  `incident` int(11) NOT NULL,
-  `period` int(11) NOT NULL,
-  `start` datetime NOT NULL,
-  `end` datetime NOT NULL,
-  `data` text NOT NULL,
+  `Name` text NOT NULL,
+  `Address` text NOT NULL,
+  `Contact` text NOT NULL,
+  `diversion` text NOT NULL,
+  `diversionNote` text NOT NULL,
+  `diversionUpdate` timestamp NOT NULL,
+  `Trauma` int(11) NOT NULL,
+  `Burn` tinyint(1) NOT NULL,
+  `Stroke` tinyint(1) NOT NULL,
+  `STEMI` tinyint(1) NOT NULL,
+  `Helipad` tinyint(1) NOT NULL,
+  `uname` text NOT NULL,
+  `upass` text NOT NULL,
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `incidenthazards`
+--
+
+DROP TABLE IF EXISTS `incidenthazards`;
+CREATE TABLE IF NOT EXISTS `incidenthazards` (
+  `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Incident` text NOT NULL,
+  `file` text NOT NULL,
+  `radius` int(11) NOT NULL,
+  `lat` float NOT NULL,
+  `lang` float NOT NULL,
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `incidentpoints`
+--
+
+DROP TABLE IF EXISTS `incidentpoints`;
+CREATE TABLE IF NOT EXISTS `incidentpoints` (
+  `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Incident` int(11) NOT NULL,
+  `file` text NOT NULL,
+  `lat` float NOT NULL,
+  `lang` float NOT NULL,
   UNIQUE KEY `ID` (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -83,13 +149,61 @@ CREATE TABLE IF NOT EXISTS `incidents` (
   `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `timeOut` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `address` text NOT NULL,
+  `lat` float NOT NULL,
+  `lang` float NOT NULL,
   `type` text NOT NULL,
   `details` text NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT '1',
-  `commandUnitID` text NOT NULL,
+  `commandUnitID` text,
+  `knox` tinyint(1) NOT NULL DEFAULT '0',
+  `elec` tinyint(1) NOT NULL DEFAULT '0',
+  `lwfloor` tinyint(1) NOT NULL DEFAULT '0',
+  `lwroof` tinyint(1) NOT NULL DEFAULT '0',
+  `truss` tinyint(1) NOT NULL DEFAULT '0',
+  `hazmat` tinyint(1) NOT NULL DEFAULT '0',
+  `abandoned` tinyint(1) NOT NULL DEFAULT '0',
+  `nowater` tinyint(1) NOT NULL DEFAULT '0',
+  `noradio` tinyint(1) NOT NULL DEFAULT '0',
+  `sprinkler` tinyint(1) NOT NULL DEFAULT '0',
+  `aed` tinyint(1) NOT NULL DEFAULT '0',
   UNIQUE KEY `ID` (`ID`),
   KEY `ID_2` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `incidenttype`
+--
+
+DROP TABLE IF EXISTS `incidenttype`;
+CREATE TABLE IF NOT EXISTS `incidenttype` (
+  `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `CadName` text NOT NULL,
+  `ShortName` text NOT NULL,
+  `pronunciation` text NOT NULL,
+  `ITCode` text NOT NULL,
+  `hasAlarms` tinyint(1) NOT NULL,
+  `type` text NOT NULL,
+  `icon` text NOT NULL,
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `localgeocoder`
+--
+
+DROP TABLE IF EXISTS `localgeocoder`;
+CREATE TABLE IF NOT EXISTS `localgeocoder` (
+  `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `LocationName` text NOT NULL,
+  `address` text NOT NULL,
+  `lat` float NOT NULL,
+  `lang` float NOT NULL,
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -131,6 +245,7 @@ CREATE TABLE IF NOT EXISTS `notification` (
 DROP TABLE IF EXISTS `patients`;
 CREATE TABLE IF NOT EXISTS `patients` (
   `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Incident` text NOT NULL,
   `firstName` text NOT NULL,
   `lastName` text NOT NULL,
   `middleInitial` text NOT NULL,
@@ -139,7 +254,11 @@ CREATE TABLE IF NOT EXISTS `patients` (
   `gender` text NOT NULL,
   `height` text NOT NULL,
   `weight` int(11) NOT NULL,
+  `chiefComplaint` text NOT NULL,
   `triage` int(11) NOT NULL,
+  `triageTag` text,
+  `status` text NOT NULL,
+  `hospital` text,
   UNIQUE KEY `ID` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -156,16 +275,73 @@ CREATE TABLE IF NOT EXISTS `personel` (
   `upass` text NOT NULL,
   `name` text NOT NULL,
   `rankname` text NOT NULL,
+  `providerLevel` text NOT NULL,
   `Unit` int(11) DEFAULT NULL,
   `perm.assign` tinyint(1) NOT NULL,
   `perm.selfassign` tinyint(1) NOT NULL,
   `perm.command` tinyint(1) NOT NULL,
+  `perm.ems` tinyint(1) NOT NULL DEFAULT '0',
   `perm.manageusers` tinyint(1) NOT NULL,
   `perm.manageunits` tinyint(1) NOT NULL,
   `perm.manageperms` tinyint(1) NOT NULL,
   `perm.managedepts` tinyint(1) NOT NULL,
   UNIQUE KEY `ID` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `preplan`
+--
+
+DROP TABLE IF EXISTS `preplan`;
+CREATE TABLE IF NOT EXISTS `preplan` (
+  `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Name` text NOT NULL,
+  `elec` tinyint(1) NOT NULL,
+  `knox` tinyint(1) NOT NULL,
+  `lwfloor` tinyint(1) NOT NULL,
+  `lwroof` tinyint(1) NOT NULL,
+  `truss` tinyint(1) NOT NULL,
+  `hazmat` tinyint(1) NOT NULL,
+  `abandoned` tinyint(1) NOT NULL,
+  `nowater` tinyint(1) NOT NULL,
+  `noradio` tinyint(1) NOT NULL,
+  `sprinkler` tinyint(1) NOT NULL,
+  `aed` tinyint(1) NOT NULL,
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `preplanpoints`
+--
+
+DROP TABLE IF EXISTS `preplanpoints`;
+CREATE TABLE IF NOT EXISTS `preplanpoints` (
+  `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `preplan` text NOT NULL,
+  `file` text NOT NULL,
+  `lat` float NOT NULL,
+  `lang` float NOT NULL,
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `providers`
+--
+
+DROP TABLE IF EXISTS `providers`;
+CREATE TABLE IF NOT EXISTS `providers` (
+  `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `patient` text NOT NULL,
+  `provider` text NOT NULL,
+  `role` text NOT NULL,
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -180,6 +356,7 @@ CREATE TABLE IF NOT EXISTS `radiocomms` (
   `Name` text NOT NULL,
   `Talkgroup` text NOT NULL,
   `Channel` text NOT NULL,
+  `pronunciation` text NOT NULL,
   UNIQUE KEY `ID` (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -213,15 +390,35 @@ CREATE TABLE IF NOT EXISTS `units` (
   `upass` text NOT NULL,
   `longName` text NOT NULL,
   `shortName` text NOT NULL,
+  `pronunciation` text NOT NULL,
   `deptID` int(11) NOT NULL,
   `status` text NOT NULL,
   `incidentID` int(11) DEFAULT NULL,
   `assignable` tinyint(1) NOT NULL,
+  `display` tinyint(1) NOT NULL,
+  `lat` float NOT NULL,
+  `lang` float NOT NULL,
   `lastPAR` timestamp NOT NULL,
   `PAR` tinyint(1) NOT NULL,
   `lastRehab` timestamp NOT NULL,
+  `assignment` text NOT NULL,
   UNIQUE KEY `ID` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `universalpoints`
+--
+
+DROP TABLE IF EXISTS `universalpoints`;
+CREATE TABLE IF NOT EXISTS `universalpoints` (
+  `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `file` text NOT NULL,
+  `lat` float NOT NULL,
+  `lang` float NOT NULL,
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
