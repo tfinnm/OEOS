@@ -9,7 +9,7 @@ if ($conn->connect_error) {
 }
 $out = "";
 
-$sql = "SELECT * FROM units WHERE incidentID = '".$_SESSION["incident"]."'";
+$sql = "SELECT * FROM units WHERE display = '1' AND incidentID = '".$_SESSION["incident"]."'";
 $result = $conn->query($sql);
 if ($result->num_rows > 0) {
 	while($row = $result->fetch_assoc()) {
